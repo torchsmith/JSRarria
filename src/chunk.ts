@@ -13,30 +13,7 @@ export default class Chunk {
 		this.x = x;
 		this.y = y;
 
-		for (let x = this.x * size; x < this.x * size + size; ++x) {
-			this.blocks.push([]);
-
-			const height = this.getHeight(x);
-
-			for (let y = this.y * size; y < this.y * size + size; ++y) {
-				// empty space above height
-				// grass at height
-				// dirt under height
-
-				if (y < height)
-					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Empty, x, y, this)
-					);
-				else if (y > height)
-					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Dirt, x, y, this)
-					);
-				else
-					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Grass, x, height, this)
-					);
-			}
-		}
+		this.generate(size);
 	}
 
 	public getBlock(x: number, y: number): Block {
@@ -86,5 +63,30 @@ export default class Chunk {
 		return height;
 	}
 
-	public generate(): void {}
+	public generate(size: number): void {
+		for (let x = this.x * size; x < this.x * size + size; ++x) {
+			this.blocks.push([]);
+
+			const height = this.getHeight(x);
+
+			for (let y = this.y * size; y < this.y * size + size; ++y) {
+				// empty space above height
+				// grass at height
+				// dirt under height
+
+				if (y < height)
+					this.blocks[x - this.x * size].push(
+						new Block(BlockType.Empty, x, y, this)
+					);
+				else if (y > height)
+					this.blocks[x - this.x * size].push(
+						new Block(BlockType.Dirt, x, y, this)
+					);
+				else
+					this.blocks[x - this.x * size].push(
+						new Block(BlockType.Grass, x, height, this)
+					);
+			}
+		}
+	}
 }

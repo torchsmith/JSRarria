@@ -15,13 +15,15 @@ export default class Game {
 	 * Camera zoom.
 	 */
 	public zoom = 2;
+	private minZoom = 2;
+	private maxZoom = 5;
 
 	/**
 	 * World width and height in chunks.
 	 */
-	private worldWidth = 2;
+	private worldWidth = 10;
 	private worldHeight = 2;
-	public chunkSize = 10;
+	public chunkSize = 30;
 
 	/**
 	 * Offset ground base height.
@@ -38,7 +40,6 @@ export default class Game {
 	 *
 	 */
 	private chunks: Chunk[][] = [];
-	// private blocks: Block[][] = [];
 
 	public stats: Stats | undefined;
 
@@ -63,36 +64,36 @@ export default class Game {
 		window.addEventListener('resize', this.resize.bind(this));
 
 		window.addEventListener('wheel', (e) => {
-			if (e.deltaY > 0 && this.zoom > 1) {
-				this.zoom -= 1;
-			} else if (e.deltaY < 0) {
-				this.zoom += 1;
+			if (e.deltaY > 0 && this.zoom > this.minZoom) {
+				this.zoom -= 0.25;
+			} else if (e.deltaY < 0 && this.zoom < this.maxZoom) {
+				this.zoom += 0.25;
 			}
 
 			// TODO: Generate new chunks if needed when zooming in/out (and moving) to fill the screen and some extra (so there is no empty space)
 
 			// how many blocks are fully visible
-			const blocksX = Math.floor(this.canvas.width / (8 * this.zoom));
-			const blocksY = Math.floor(this.canvas.height / (8 * this.zoom));
+			// const blocksX = Math.floor(this.canvas.width / (8 * this.zoom));
+			// const blocksY = Math.floor(this.canvas.height / (8 * this.zoom));
 
-			// how many chunks
-			const chunksX = Math.ceil(blocksX / this.chunkSize);
-			const chunksY = Math.ceil(blocksY / this.chunkSize);
+			// // how many chunks
+			// const chunksX = Math.ceil(blocksX / this.chunkSize);
+			// const chunksY = Math.ceil(blocksY / this.chunkSize);
 
-			// how many blocks are visible in the last chunk
-			const lastChunkBlocksX = blocksX % this.chunkSize;
-			const lastChunkBlocksY = blocksY % this.chunkSize;
+			// // how many blocks are visible in the last chunk
+			// const lastChunkBlocksX = blocksX % this.chunkSize;
+			// const lastChunkBlocksY = blocksY % this.chunkSize;
 
-			// if more than half of the last chunk is visible, add one more chunk
-			if (lastChunkBlocksX > this.chunkSize / 2) {
-				// Generate new chunks
-				// Figure out if needed on left or right
-			}
+			// // if more than half of the last chunk is visible, add one more chunk
+			// if (lastChunkBlocksX > this.chunkSize / 2) {
+			// 	// Generate new chunks
+			// 	// Figure out if needed on left or right
+			// }
 
-			if (lastChunkBlocksY > this.chunkSize / 2) {
-				// Generate new chunks
-				// Figure out if needed on left or right
-			}
+			// if (lastChunkBlocksY > this.chunkSize / 2) {
+			// 	// Generate new chunks
+			// 	// Figure out if needed on left or right
+			// }
 
 			// IMPORTANT: Make logic reusable for when moving as well as zooming
 
