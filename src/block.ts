@@ -12,6 +12,8 @@ export enum BlockType {
  * Controls an individual block.
  */
 export default class Block {
+	public static readonly size = 8;
+
 	// block type
 	public type: BlockType;
 
@@ -165,12 +167,16 @@ export default class Block {
 			Block.blockTextureMap[this.type],
 			coords[0] * 9,
 			coords[1] * 9,
-			8,
-			8,
-			this.x * 8 * Game.instance.zoom,
-			this.y * 8 * Game.instance.zoom,
-			8 * Game.instance.zoom,
-			8 * Game.instance.zoom
+			Block.size,
+			Block.size,
+			(this.x - Game.instance.camera.x) *
+				Block.size *
+				Game.instance.camera.zoom,
+			(this.y - Game.instance.camera.y) *
+				Block.size *
+				Game.instance.camera.zoom,
+			Block.size * Game.instance.camera.zoom,
+			Block.size * Game.instance.camera.zoom
 		);
 	}
 }

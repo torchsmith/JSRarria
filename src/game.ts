@@ -1,6 +1,9 @@
 import Block, { BlockType } from './block';
 import Stats from 'stats.js';
 import Chunk from './chunk';
+import Player from './player';
+import Input from './input';
+import Camera from './camera';
 
 export default class Game {
 	/**
@@ -12,11 +15,9 @@ export default class Game {
 	public ctx: CanvasRenderingContext2D;
 
 	/**
-	 * Camera zoom.
+	 * Camera.
 	 */
-	public zoom = 2;
-	private minZoom = 2;
-	private maxZoom = 5;
+	public camera: Camera = new Camera();
 
 	/**
 	 * World width and height in chunks.
@@ -41,12 +42,28 @@ export default class Game {
 	 */
 	private chunks: Chunk[][] = [];
 
+	/**
+	 * Player.
+	 * TODO: Add multiplayer support.
+	 */
+	private players: Player[] = [];
+
+	/**
+	 * Game loop.
+	 * TODO: Add multiplayer support.
+	 */
+	private lastUpdate = 0;
+	private updateRate = 60; // updates per second
+
 	public stats: Stats | undefined;
 
 	constructor(stats: boolean = false) {
 		if (Game.instance) throw new Error('Game already exists!');
 
 		Game.instance = this;
+
+		// Create Input singleton instance
+		new Input();
 
 		if (stats) {
 			this.stats = new Stats();
@@ -63,49 +80,16 @@ export default class Game {
 
 		window.addEventListener('resize', this.resize.bind(this));
 
-		window.addEventListener('wheel', (e) => {
-			if (e.deltaY > 0 && this.zoom > this.minZoom) {
-				this.zoom -= 0.25;
-			} else if (e.deltaY < 0 && this.zoom < this.maxZoom) {
-				this.zoom += 0.25;
-			}
-
-			// TODO: Generate new chunks if needed when zooming in/out (and moving) to fill the screen and some extra (so there is no empty space)
-
-			// how many blocks are fully visible
-			// const blocksX = Math.floor(this.canvas.width / (8 * this.zoom));
-			// const blocksY = Math.floor(this.canvas.height / (8 * this.zoom));
-
-			// // how many chunks
-			// const chunksX = Math.ceil(blocksX / this.chunkSize);
-			// const chunksY = Math.ceil(blocksY / this.chunkSize);
-
-			// // how many blocks are visible in the last chunk
-			// const lastChunkBlocksX = blocksX % this.chunkSize;
-			// const lastChunkBlocksY = blocksY % this.chunkSize;
-
-			// // if more than half of the last chunk is visible, add one more chunk
-			// if (lastChunkBlocksX > this.chunkSize / 2) {
-			// 	// Generate new chunks
-			// 	// Figure out if needed on left or right
-			// }
-
-			// if (lastChunkBlocksY > this.chunkSize / 2) {
-			// 	// Generate new chunks
-			// 	// Figure out if needed on left or right
-			// }
-
-			// IMPORTANT: Make logic reusable for when moving as well as zooming
-
-			console.log('new zoom', this.zoom);
-		});
-
 		this.canvas.addEventListener('click', this.onClick.bind(this));
 	}
 
 	private onClick(e: MouseEvent): void {
-		const x = Math.floor(e.offsetX / (8 * this.zoom));
-		const y = Math.floor(e.offsetY / (8 * this.zoom));
+		const x = Math.floor(
+			(e.offsetX + Game.instance.camera.x) / (Block.size * this.camera.zoom)
+		);
+		const y = Math.floor(
+			(e.offsetY + Game.instance.camera.y) / (Block.size * this.camera.zoom)
+		);
 
 		const block = this.getBlock(x, y);
 
@@ -145,6 +129,9 @@ export default class Game {
 				this.chunks[x].push(new Chunk(this.chunkSize, x, y));
 			}
 		}
+
+		this.players.push(new Player(100, 10));
+
 		// Keep things pixelated
 		this.ctx.imageSmoothingEnabled = false;
 	}
@@ -164,10 +151,19 @@ export default class Game {
 			}
 		}
 
+		// Render player
+		this.players[0].render(this.ctx);
+
 		this.stats?.end();
 
 		// Render next frame
 		requestAnimationFrame(() => {
+			const now = Date.now();
+			const deltaTime = now - this.lastUpdate;
+
+			this.lastUpdate = now;
+
+			this.update(deltaTime / 1000);
 			this.render();
 		});
 	}
@@ -175,7 +171,15 @@ export default class Game {
 	/**
 	 * Update the game. This contains all the game logic.
 	 */
-	private update(): void {}
+	private update(deltaTime: number): void {
+		this.players[0].update(deltaTime);
+	}
+
+	/**
+	 * Update the physics of the game. This contains all the physics logic.
+	 * This is called at a fixed rate.
+	 */
+	private fixedUpdate(): void {}
 
 	/**
 	 * Start the game. This will initialize the game and start the update and render loops.
@@ -188,7 +192,15 @@ export default class Game {
 	 */
 	public start(): void {
 		this.init();
-		this.update();
+
+		this.lastUpdate = Date.now();
+		this.update(0);
+
+		// Start update loop
+		setInterval(() => {
+			this.fixedUpdate();
+		}, 1000 / this.updateRate);
+
 		this.render();
 	}
 
