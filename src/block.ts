@@ -15,7 +15,7 @@ export default class Block {
 	// block type
 	public type: BlockType;
 
-	public static blockTextureMap: CanvasImageSource;
+	public static blockTextureMap: HTMLImageElement[];
 
 	// block position
 	public x: number;
@@ -30,8 +30,12 @@ export default class Block {
 		this.chunk = chunk;
 
 		if (!Block.blockTextureMap) {
-			Block.blockTextureMap = new Image();
-			Block.blockTextureMap.src = './assets/TileSheet.png';
+			Block.blockTextureMap = [];
+			// Loop through all block types
+			for (let i = 1; i < Object.keys(BlockType).length / 2; ++i) {
+				Block.blockTextureMap.push(new Image());
+				Block.blockTextureMap[i - 1].src = `./assets/blocks/block-${i}.png`;
+			}
 		}
 	}
 
@@ -72,52 +76,71 @@ export default class Block {
 		const blockRight = Game.instance.getBlock(this.x + 1, this.y);
 
 		const matrix = [
-			// Top left
 			[
 				// 0 = empty, 1 = block, //// one day maybe: 2 = same block
-				[0, 1, 1, 0],
+				[1, 1, 1, 0],
 				// x, y texture offset in blocks
 				[0, 0],
 			],
-			// Top middle
 			[
 				[0, 1, 1, 1],
 				[1, 0],
 			],
-			// Top right
-			[
-				[0, 0, 1, 1],
-				[2, 0],
-			],
-			// Middle left
-			[
-				[1, 1, 1, 0],
-				[0, 1],
-			],
-			// Middle middle
-			[
-				[1, 1, 1, 1],
-				[1, 1],
-			],
-			// Middle right
 			[
 				[1, 0, 1, 1],
-				[2, 1],
+				[4, 0],
 			],
-			// Bottom left
-			[
-				[1, 1, 0, 0],
-				[0, 2],
-			],
-			// Bottom middle
 			[
 				[1, 1, 0, 1],
 				[1, 2],
 			],
-			// Bottom right
+			[
+				[1, 1, 1, 1],
+				[1, 1],
+			],
+			[
+				[0, 1, 1, 0],
+				[0, 3],
+			],
+			[
+				[0, 0, 1, 1],
+				[1, 3],
+			],
+			[
+				[1, 1, 0, 0],
+				[0, 4],
+			],
 			[
 				[1, 0, 0, 1],
-				[2, 2],
+				[1, 4],
+			],
+			[
+				[1, 0, 1, 0],
+				[5, 0],
+			],
+			[
+				[0, 0, 1, 0],
+				[6, 0],
+			],
+			[
+				[1, 0, 0, 0],
+				[6, 3],
+			],
+			[
+				[0, 1, 0, 0],
+				[9, 0],
+			],
+			[
+				[0, 0, 0, 0],
+				[9, 3],
+			],
+			[
+				[0, 0, 0, 1],
+				[12, 0],
+			],
+			[
+				[0, 1, 0, 1],
+				[6, 4],
 			],
 		];
 
@@ -139,9 +162,9 @@ export default class Block {
 		})?.[1] || [0, 0];
 
 		ctx.drawImage(
-			Block.blockTextureMap,
-			(this.type - 1) * 24 + coords[0] * 8,
-			coords[1] * 8,
+			Block.blockTextureMap[this.type],
+			coords[0] * 9,
+			coords[1] * 9,
 			8,
 			8,
 			this.x * 8 * Game.instance.zoom,
