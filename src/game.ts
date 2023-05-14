@@ -84,20 +84,13 @@ export default class Game {
 	}
 
 	private onClick(e: MouseEvent): void {
-		const x = Math.floor(
-			(e.offsetX + Game.instance.camera.x) / (Block.size * this.camera.zoom)
-		);
-		const y = Math.floor(
-			(e.offsetY + Game.instance.camera.y) / (Block.size * this.camera.zoom)
-		);
-
-		const block = this.getBlock(x, y);
+		const block = this.getBlockAtScreenPoint(e.offsetX, e.offsetY);
 
 		if (block) {
 			block.setType(BlockType.Empty);
 		}
 
-		console.log('click', x, y);
+		// console.log('click', x, y);
 	}
 
 	public getChunk(x: number, y: number): Chunk | undefined {
@@ -118,6 +111,25 @@ export default class Game {
 		);
 	}
 
+	// TODO: THIS DOES NOT WORK. FIX IT. BEING USED BY ON CLICK EVENT
+	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {
+		const worldX = x + this.camera.x;
+		const worldY = y + this.camera.y;
+
+		return this.getBlockAtWorldPoint(worldX, worldY);
+	}
+
+	public getBlockAtWorldPoint(x: number, y: number): Block | undefined {
+		const blockX = Math.floor(
+			x / (Block.size * this.camera.zoom) + Game.instance.camera.x
+		);
+		const blockY = Math.floor(
+			y / (Block.size * this.camera.zoom) + Game.instance.camera.y
+		);
+
+		return this.getBlock(blockX, blockY);
+	}
+
 	/**
 	 * Initialize the game.
 	 */
@@ -130,7 +142,7 @@ export default class Game {
 			}
 		}
 
-		this.players.push(new Player(100, 10));
+		this.players.push(new Player(0, -10));
 
 		// Keep things pixelated
 		this.ctx.imageSmoothingEnabled = false;

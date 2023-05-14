@@ -1,4 +1,5 @@
 import Chunk from './chunk';
+import Collider from './collider';
 import Game from './game';
 
 export enum BlockType {
@@ -14,12 +15,17 @@ export enum BlockType {
 export default class Block {
 	public static readonly size = 8;
 
+	// Texture map for all block types
+	public static blockTextureMap: HTMLImageElement[];
+
 	// block type
 	public type: BlockType;
 
-	public static blockTextureMap: HTMLImageElement[];
+	public collider: Collider;
 
-	// block position
+	// block position in the block grid (not world position)
+	public gridX: number;
+	public gridY: number;
 	public x: number;
 	public y: number;
 
@@ -27,9 +33,14 @@ export default class Block {
 
 	constructor(type: BlockType, x: number, y: number, chunk: Chunk) {
 		this.type = type;
-		this.x = x;
-		this.y = y;
+		this.gridX = x;
+		this.gridY = y;
+
+		this.x = x * Block.size;
+		this.y = y * Block.size;
+
 		this.chunk = chunk;
+		this.collider = new Collider(this.x, this.y, Block.size, Block.size);
 
 		if (!Block.blockTextureMap) {
 			Block.blockTextureMap = [];
@@ -50,32 +61,32 @@ export default class Block {
 	}
 
 	public getX(): number {
-		return this.x;
+		return this.gridX;
 	}
 
 	public getY(): number {
-		return this.y;
+		return this.gridY;
 	}
 
 	public setX(x: number): void {
-		this.x = x;
+		this.gridX = x;
 	}
 
 	public setY(y: number): void {
-		this.y = y;
+		this.gridY = y;
 	}
 
 	public toString(): string {
-		return `Block: ${this.type} X: ${this.x} Y: ${this.y}`;
+		return `Block: ${this.type} X: ${this.gridX} Y: ${this.gridY}`;
 	}
 
 	public render(ctx: CanvasRenderingContext2D): void {
 		if (this.type === BlockType.Empty) return;
 
-		const blockAbove = Game.instance.getBlock(this.x, this.y - 1);
-		const blockBelow = Game.instance.getBlock(this.x, this.y + 1);
-		const blockLeft = Game.instance.getBlock(this.x - 1, this.y);
-		const blockRight = Game.instance.getBlock(this.x + 1, this.y);
+		const blockAbove = Game.instance.getBlock(this.gridX, this.gridY - 1);
+		const blockBelow = Game.instance.getBlock(this.gridX, this.gridY + 1);
+		const blockLeft = Game.instance.getBlock(this.gridX - 1, this.gridY);
+		const blockRight = Game.instance.getBlock(this.gridX + 1, this.gridY);
 
 		const matrix = [
 			[
@@ -169,14 +180,11 @@ export default class Block {
 			coords[1] * 9,
 			Block.size,
 			Block.size,
-			(this.x - Game.instance.camera.x) *
-				Block.size *
-				Game.instance.camera.zoom,
-			(this.y - Game.instance.camera.y) *
-				Block.size *
-				Game.instance.camera.zoom,
-			Block.size * Game.instance.camera.zoom,
-			Block.size * Game.instance.camera.zoom
+
+			Game.instance.camera.getRenderX(this.x),
+			Game.instance.camera.getRenderY(this.y),
+			Game.instance.camera.getRenderWidth(Block.size),
+			Game.instance.camera.getRenderHeight(Block.size)
 		);
 	}
 }

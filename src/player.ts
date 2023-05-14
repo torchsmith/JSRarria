@@ -1,3 +1,4 @@
+import { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
@@ -7,6 +8,9 @@ export default class Player {
 	public name = 'Player';
 	public health = 0;
 	public maxHealth = 100;
+
+	private width = 16;
+	private height = 32;
 
 	public x;
 	public y;
@@ -21,7 +25,7 @@ export default class Player {
 		this.x = spawnX;
 		this.y = spawnY;
 
-		this.collider = new Collider(this.x, this.y, 16, 32);
+		this.collider = new Collider(this.x, this.y, this.width, this.height);
 
 		this.init();
 	}
@@ -36,15 +40,15 @@ export default class Player {
 		ctx.fillStyle = 'black';
 
 		ctx.fillRect(
-			(this.x - Game.instance.camera.x) * Game.instance.camera.zoom,
-			(this.y - Game.instance.camera.y) * Game.instance.camera.zoom,
-			16 * Game.instance.camera.zoom,
-			32 * Game.instance.camera.zoom
+			Game.instance.camera.getRenderX(this.x),
+			Game.instance.camera.getRenderY(this.y),
+			Game.instance.camera.getRenderWidth(this.width),
+			Game.instance.camera.getRenderHeight(this.height)
 		);
 	}
 
 	public toString(): string {
-		return this.name;
+		return `${this.name} (${this.health}/${this.maxHealth}) at (${this.x}, ${this.y})`;
 	}
 
 	public update(deltaTime: number): void {
@@ -56,16 +60,79 @@ export default class Player {
 		// if player is colliding with any of those tiles revert movement.
 		// do this for both x and y separately to allow for sliding on walls.
 
-		this.x += this.forceX * deltaTime;
-		this.y += this.forceY * deltaTime;
+		const blockAbove = Game.instance.getBlockAtWorldPoint(this.x, this.y - 1);
+		const blockBelow = Game.instance.getBlockAtWorldPoint(this.x, this.y + 1);
+		const blockLeft = Game.instance.getBlockAtWorldPoint(this.x - 1, this.y);
+		const blockRight = Game.instance.getBlockAtWorldPoint(this.x + 1, this.y);
+
+		// console.log(this.toString());
+
+		const xChange = this.forceX * deltaTime;
+
+		this.collider.x += xChange;
+
+		if (blockAbove && blockAbove.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockAbove.collider)) {
+				console.log('X colliding with block above', blockAbove, this.collider);
+				this.collider.x -= xChange;
+			}
+		}
+
+		if (blockBelow && blockBelow.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockBelow.collider)) {
+				console.log('X colliding with block Below', blockBelow, this.collider);
+				this.collider.x -= xChange;
+			}
+		}
+
+		if (blockLeft && blockLeft.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockLeft.collider)) {
+				console.log('X colliding with block Left', blockLeft, this.collider);
+				this.collider.x -= xChange;
+			}
+		}
+
+		if (blockRight && blockRight.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockRight.collider)) {
+				console.log('X colliding with block Right', blockRight, this.collider);
+				this.collider.x -= xChange;
+			}
+		}
+
+		const yChange = this.forceY * deltaTime;
+
+		// console.log(blockBelow, blockBelow?.type, blockBelow?.collider);
+
+		this.collider.y += yChange;
+
+		if (blockAbove && blockAbove.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockAbove.collider)) {
+				console.log('Y colliding with block Above', blockAbove, this.collider);
+				this.collider.y -= yChange;
+			}
+		}
+
+		if (blockBelow && blockBelow.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockBelow.collider)) {
+				console.log('Y colliding with block Below', blockBelow, this.collider);
+				this.collider.y -= yChange;
+			}
+		}
+
+		this.x = this.collider.x;
+		this.y = this.collider.y;
 
 		// gravity
-		this.forceY = lerp(this.forceY, 20, deltaTime);
+		this.forceY = lerp(this.forceY, 5, deltaTime);
 
 		this.forceX *= this.forceDrag;
 
-		Game.instance.camera.x = this.x;
-		Game.instance.camera.y = this.y;
+		Game.instance.camera.x =
+			this.x +
+			this.width / 2 -
+			Game.instance.canvas.width / Game.instance.camera.zoom / 2;
+		Game.instance.camera.y =
+			this.y - Game.instance.canvas.height / Game.instance.camera.zoom / 2;
 	}
 
 	public move(): void {

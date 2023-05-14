@@ -45,6 +45,34 @@ export default class Camera {
 		});
 	}
 
+	/**
+	 * Returns the render x coordinate based on the camera position and zoom.
+	 */
+	public getRenderX(x: number): number {
+		return (x - this.x) * this.zoom;
+	}
+
+	/**
+	 * Returns the render y coordinate based on the camera position and zoom.
+	 */
+	public getRenderY(y: number): number {
+		return (y - this.y) * this.zoom;
+	}
+
+	/**
+	 * Returns the render width based on the camera zoom.
+	 */
+	public getRenderWidth(width: number): number {
+		return width * this.zoom;
+	}
+
+	/**
+	 * Returns the render height based on the camera zoom.
+	 */
+	public getRenderHeight(height: number): number {
+		return height * this.zoom;
+	}
+
 	public move(x: number, y: number): void {
 		this.x = x;
 		this.y = y;
