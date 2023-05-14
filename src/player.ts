@@ -1,4 +1,4 @@
-import Block from './block';
+import Collider from './collider';
 import Game from './game';
 import Input from './input';
 import { lerp } from './utils';
@@ -15,10 +15,13 @@ export default class Player {
 	public forceY = 0;
 
 	private forceDrag = 0.9;
+	private collider: Collider;
 
 	constructor(spawnX: number, spawnY: number) {
 		this.x = spawnX;
 		this.y = spawnY;
+
+		this.collider = new Collider(this.x, this.y, 16, 32);
 
 		this.init();
 	}
@@ -46,6 +49,12 @@ export default class Player {
 
 	public update(deltaTime: number): void {
 		this.move();
+
+		// TODO: get closest tile above, below, left, and right of player.
+		// add collider class to tiles.
+		// check if player is colliding with any of those tiles using Collider class.
+		// if player is colliding with any of those tiles revert movement.
+		// do this for both x and y separately to allow for sliding on walls.
 
 		this.x += this.forceX * deltaTime;
 		this.y += this.forceY * deltaTime;
