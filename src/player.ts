@@ -61,11 +61,15 @@ export default class Player {
 		// do this for both x and y separately to allow for sliding on walls.
 
 		const blockAbove = Game.instance.getBlockAtWorldPoint(this.x, this.y - 1);
-		const blockBelow = Game.instance.getBlockAtWorldPoint(this.x, this.y + 1);
+		const blockBelow = Game.instance.getBlockAtWorldPoint(
+			this.x,
+			this.y + this.height + 1
+		);
 		const blockLeft = Game.instance.getBlockAtWorldPoint(this.x - 1, this.y);
-		const blockRight = Game.instance.getBlockAtWorldPoint(this.x + 1, this.y);
-
-		// console.log(this.toString());
+		const blockRight = Game.instance.getBlockAtWorldPoint(
+			this.x + this.width + 1,
+			this.y
+		);
 
 		const xChange = this.forceX * deltaTime;
 
@@ -101,8 +105,6 @@ export default class Player {
 
 		const yChange = this.forceY * deltaTime;
 
-		// console.log(blockBelow, blockBelow?.type, blockBelow?.collider);
-
 		this.collider.y += yChange;
 
 		if (blockAbove && blockAbove.type !== BlockType.Empty) {
@@ -123,10 +125,12 @@ export default class Player {
 		this.y = this.collider.y;
 
 		// gravity
-		this.forceY = lerp(this.forceY, 5, deltaTime);
+		this.forceY = lerp(this.forceY, 60, deltaTime * 2);
 
+		// Slow down horizontal movement
 		this.forceX *= this.forceDrag;
 
+		// Move camera to center of player
 		Game.instance.camera.x =
 			this.x +
 			this.width / 2 -
@@ -137,14 +141,14 @@ export default class Player {
 
 	public move(): void {
 		if (Input.keys['d']) {
-			this.forceX = Math.min(this.forceX + 3, 10);
+			this.forceX = Math.min(this.forceX + 10, 50);
 		} else if (Input.keys['a']) {
-			this.forceX = Math.max(this.forceX - 3, -10);
+			this.forceX = Math.max(this.forceX - 10, -50);
 		}
 	}
 
 	public jump(): void {
-		this.forceY = -20;
+		this.forceY = -100;
 	}
 
 	public attack(): void {}
