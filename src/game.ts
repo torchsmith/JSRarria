@@ -89,8 +89,6 @@ export default class Game {
 		if (block) {
 			block.setType(BlockType.Empty);
 		}
-
-		// console.log('click', x, y);
 	}
 
 	public getChunk(x: number, y: number): Chunk | undefined {
@@ -111,21 +109,16 @@ export default class Game {
 		);
 	}
 
-	// TODO: THIS DOES NOT WORK. FIX IT. BEING USED BY ON CLICK EVENT
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {
-		const worldX = x + this.camera.x;
-		const worldY = y + this.camera.y;
+		const worldX = x + this.camera.x * 2; // Times 2 because camera is centered
+		const worldY = y + this.camera.y * 2; // Times 2 because camera is centered
 
 		return this.getBlockAtWorldPoint(worldX, worldY);
 	}
 
 	public getBlockAtWorldPoint(x: number, y: number): Block | undefined {
-		const blockX = Math.floor(
-			x / (Block.size * this.camera.zoom) + Game.instance.camera.x
-		);
-		const blockY = Math.floor(
-			y / (Block.size * this.camera.zoom) + Game.instance.camera.y
-		);
+		const blockX = Math.floor(x / (Block.size * this.camera.zoom));
+		const blockY = Math.floor(y / (Block.size * this.camera.zoom));
 
 		return this.getBlock(blockX, blockY);
 	}
