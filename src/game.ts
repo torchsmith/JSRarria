@@ -110,15 +110,15 @@ export default class Game {
 	}
 
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {
-		const worldX = x + this.camera.x * 2; // Times 2 because camera is centered
-		const worldY = y + this.camera.y * 2; // Times 2 because camera is centered
+		const worldX = (x + this.camera.x * 2) / this.camera.zoom; // Times 2 because camera is centered
+		const worldY = (y + this.camera.y * 2) / this.camera.zoom; // Times 2 because camera is centered
 
 		return this.getBlockAtWorldPoint(worldX, worldY);
 	}
 
 	public getBlockAtWorldPoint(x: number, y: number): Block | undefined {
-		const blockX = Math.floor(x / (Block.size * this.camera.zoom));
-		const blockY = Math.floor(y / (Block.size * this.camera.zoom));
+		const blockX = Math.floor(x / Block.size);
+		const blockY = Math.floor(y / Block.size);
 
 		return this.getBlock(blockX, blockY);
 	}
@@ -135,7 +135,7 @@ export default class Game {
 			}
 		}
 
-		this.players.push(new Player(0, -10));
+		this.players.push(new Player(1000, -10));
 
 		// Keep things pixelated
 		this.ctx.imageSmoothingEnabled = false;
