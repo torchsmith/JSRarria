@@ -110,8 +110,8 @@ export default class Game {
 	}
 
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {
-		const worldX = (x + this.camera.x * 2) / this.camera.zoom; // Times 2 because camera is centered
-		const worldY = (y + this.camera.y * 2) / this.camera.zoom; // Times 2 because camera is centered
+		const worldX = (x + this.camera.getX() * 2) / this.camera.zoom; // Times 2 because camera is centered
+		const worldY = (y + this.camera.getY() * 2) / this.camera.zoom; // Times 2 because camera is centered
 
 		return this.getBlockAtWorldPoint(worldX, worldY);
 	}

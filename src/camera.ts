@@ -1,6 +1,6 @@
 export default class Camera {
-	public x = 0;
-	public y = 0;
+	private x = 0;
+	private y = 0;
 
 	public zoom = 2;
 	private minZoom = 2;
@@ -76,6 +76,22 @@ export default class Camera {
 	public move(x: number, y: number): void {
 		this.x = x;
 		this.y = y;
+	}
+
+	public setX(x: number): void {
+		this.x = x;
+	}
+
+	public setY(y: number): void {
+		this.y = y;
+	}
+
+	public getX(): number {
+		return this.x;
+	}
+
+	public getY(): number {
+		return this.y;
 	}
 
 	public zoomIn(): void {

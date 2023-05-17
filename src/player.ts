@@ -61,44 +61,67 @@ export default class Player {
 		// do this for both x and y separately to allow for sliding on walls.
 
 		const blockAbove = Game.instance.getBlockAtWorldPoint(this.x, this.y - 1);
-		const blockBelow = Game.instance.getBlockAtWorldPoint(
+		const blockBelowLeft = Game.instance.getBlockAtWorldPoint(
 			this.x,
 			this.y + this.height + 1
 		);
-		const blockLeft = Game.instance.getBlockAtWorldPoint(this.x - 1, this.y);
-		const blockRight = Game.instance.getBlockAtWorldPoint(
+		const blockBelowRight = Game.instance.getBlockAtWorldPoint(
+			this.x + this.width,
+			this.y + this.height + 1
+		);
+		const blockLeftTop = Game.instance.getBlockAtWorldPoint(this.x - 1, this.y);
+		const blockRightTop = Game.instance.getBlockAtWorldPoint(
 			this.x + this.width + 1,
 			this.y
+		);
+		const blockLeftBottom = Game.instance.getBlockAtWorldPoint(
+			this.x - 1,
+			this.y + this.height
+		);
+		const blockRightBottom = Game.instance.getBlockAtWorldPoint(
+			this.x + this.width + 1,
+			this.y + this.height
 		);
 
 		const xChange = this.forceX * deltaTime;
 
 		this.collider.x += xChange;
 
-		if (blockAbove && blockAbove.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockAbove.collider)) {
-				console.log('X colliding with block above', blockAbove, this.collider);
+		if (blockLeftBottom && blockLeftBottom.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockLeftBottom.collider)) {
+				console.log(
+					'X colliding with block Left',
+					blockLeftBottom,
+					this.collider
+				);
 				this.collider.x -= xChange;
 			}
 		}
 
-		if (blockBelow && blockBelow.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockBelow.collider)) {
-				console.log('X colliding with block Below', blockBelow, this.collider);
+		if (blockRightBottom && blockRightBottom.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockRightBottom.collider)) {
+				console.log(
+					'X colliding with block Right',
+					blockRightBottom,
+					this.collider
+				);
+				this.collider.x -= xChange;
+			}
+		}
+		if (blockLeftTop && blockLeftTop.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockLeftTop.collider)) {
+				console.log('X colliding with block Left', blockLeftTop, this.collider);
 				this.collider.x -= xChange;
 			}
 		}
 
-		if (blockLeft && blockLeft.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockLeft.collider)) {
-				console.log('X colliding with block Left', blockLeft, this.collider);
-				this.collider.x -= xChange;
-			}
-		}
-
-		if (blockRight && blockRight.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockRight.collider)) {
-				console.log('X colliding with block Right', blockRight, this.collider);
+		if (blockRightTop && blockRightTop.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockRightTop.collider)) {
+				console.log(
+					'X colliding with block Right',
+					blockRightTop,
+					this.collider
+				);
 				this.collider.x -= xChange;
 			}
 		}
@@ -114,9 +137,23 @@ export default class Player {
 			}
 		}
 
-		if (blockBelow && blockBelow.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockBelow.collider)) {
-				console.log('Y colliding with block Below', blockBelow, this.collider);
+		if (blockBelowLeft && blockBelowLeft.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockBelowLeft.collider)) {
+				console.log(
+					'Y colliding with block Below',
+					blockBelowLeft,
+					this.collider
+				);
+				this.collider.y -= yChange;
+			}
+		}
+		if (blockBelowRight && blockBelowRight.type !== BlockType.Empty) {
+			if (this.collider.isCollidingWith(blockBelowRight.collider)) {
+				console.log(
+					'Y colliding with block Below',
+					blockBelowRight,
+					this.collider
+				);
 				this.collider.y -= yChange;
 			}
 		}
@@ -131,12 +168,14 @@ export default class Player {
 		this.forceX *= this.forceDrag;
 
 		// Move camera to center of player
-		Game.instance.camera.x =
+		Game.instance.camera.setX(
 			this.x +
-			this.width / 2 -
-			Game.instance.canvas.width / Game.instance.camera.zoom / 2;
-		Game.instance.camera.y =
-			this.y - Game.instance.canvas.height / Game.instance.camera.zoom / 2;
+				this.width / 2 -
+				Game.instance.canvas.width / Game.instance.camera.zoom / 2
+		);
+		Game.instance.camera.setY(
+			this.y - Game.instance.canvas.height / Game.instance.camera.zoom / 2
+		);
 	}
 
 	public move(): void {
