@@ -181,8 +181,8 @@ export default class Block {
 			Block.size,
 			Block.size,
 
-			Game.instance.camera.getRenderX(this.x),
-			Game.instance.camera.getRenderY(this.y),
+			Math.round(Game.instance.camera.getRenderX(this.x)),
+			Math.round(Game.instance.camera.getRenderY(this.y)),
 			Game.instance.camera.getRenderWidth(Block.size),
 			Game.instance.camera.getRenderHeight(Block.size)
 		);
