@@ -110,8 +110,10 @@ export default class Game {
 	}
 
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {
-		const worldX = (x + this.camera.getX() * 2) / this.camera.zoom; // Times 2 because camera is centered
-		const worldY = (y + this.camera.getY() * 2) / this.camera.zoom; // Times 2 because camera is centered
+		const worldX =
+			(x + this.camera.getX() * this.camera.zoom) / this.camera.zoom; // Times zoom because camera is centered
+		const worldY =
+			(y + this.camera.getY() * this.camera.zoom) / this.camera.zoom; // Times zoom because camera is centered
 
 		return this.getBlockAtWorldPoint(worldX, worldY);
 	}
@@ -121,6 +123,31 @@ export default class Game {
 		const blockY = Math.floor(y / Block.size);
 
 		return this.getBlock(blockX, blockY);
+	}
+
+	/**
+	 * Get blocks given an area in world points.
+	 */
+	public getBlocksInArea(
+		x: number,
+		y: number,
+		width: number,
+		height: number
+	): Block[] {
+		const blocks: Block[] = [];
+
+		// get blocks at world points, check every block size pixels to not waste performance
+		for (let i = x; i < x + width; i += Block.size / 2) {
+			for (let j = y; j < y + height; j += Block.size / 2) {
+				const block = this.getBlockAtWorldPoint(i, j);
+
+				if (block) {
+					blocks.push(block);
+				}
+			}
+		}
+
+		return blocks;
 	}
 
 	/**

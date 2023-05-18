@@ -1,4 +1,4 @@
-import { BlockType } from './block';
+import Block, { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
@@ -60,109 +60,69 @@ export default class Player {
 		// if player is colliding with any of those tiles revert movement.
 		// do this for both x and y separately to allow for sliding on walls.
 
-		const blockAbove = Game.instance.getBlockAtWorldPoint(this.x, this.y - 1);
-		const blockBelowLeft = Game.instance.getBlockAtWorldPoint(
-			this.x,
-			this.y + this.height + 1
-		);
-		const blockBelowRight = Game.instance.getBlockAtWorldPoint(
-			this.x + this.width,
-			this.y + this.height + 1
-		);
-		const blockLeftTop = Game.instance.getBlockAtWorldPoint(this.x - 1, this.y);
-		const blockRightTop = Game.instance.getBlockAtWorldPoint(
-			this.x + this.width + 1,
-			this.y
-		);
-		const blockLeftBottom = Game.instance.getBlockAtWorldPoint(
-			this.x - 1,
-			this.y + this.height
-		);
-		const blockRightBottom = Game.instance.getBlockAtWorldPoint(
-			this.x + this.width + 1,
-			this.y + this.height
-		);
-
 		const xChange = this.forceX * deltaTime;
 
 		this.collider.x += xChange;
 
-		if (blockLeftBottom && blockLeftBottom.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockLeftBottom.collider)) {
-				console.log(
-					'X colliding with block Left',
-					blockLeftBottom,
-					this.collider
-				);
-				this.collider.x -= xChange;
-			}
-		}
+		const blocksHorizontal = Game.instance
+			.getBlocksInArea(this.collider.x - 1, this.y, 2, this.height)
+			.concat(
+				Game.instance.getBlocksInArea(
+					this.collider.x + this.width - 1,
+					this.y,
+					2,
+					this.height
+				)
+			);
 
-		if (blockRightBottom && blockRightBottom.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockRightBottom.collider)) {
-				console.log(
-					'X colliding with block Right',
-					blockRightBottom,
-					this.collider
-				);
-				this.collider.x -= xChange;
-			}
-		}
-		if (blockLeftTop && blockLeftTop.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockLeftTop.collider)) {
-				console.log('X colliding with block Left', blockLeftTop, this.collider);
-				this.collider.x -= xChange;
-			}
-		}
-
-		if (blockRightTop && blockRightTop.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockRightTop.collider)) {
-				console.log(
-					'X colliding with block Right',
-					blockRightTop,
-					this.collider
-				);
-				this.collider.x -= xChange;
-			}
+		// if any blocksHorizontal are colliding with player, revert movement
+		if (
+			blocksHorizontal.some(
+				(block) =>
+					block.type !== BlockType.Empty &&
+					block.collider.isCollidingWith(this.collider)
+			)
+		) {
+			this.collider.x -= xChange;
+			this.collider.x = Math.round(this.collider.x);
 		}
 
 		const yChange = this.forceY * deltaTime;
 
+		// console.log('player y+h', this.y + this.height);
+		// console.log(yChange, this.collider.y);dd
 		this.collider.y += yChange;
 
-		if (blockAbove && blockAbove.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockAbove.collider)) {
-				console.log('Y colliding with block Above', blockAbove, this.collider);
-				this.collider.y -= yChange;
-			}
-		}
+		const blocksVertical = Game.instance
+			.getBlocksInArea(this.x, this.collider.y - 1, this.width, 2)
+			.concat(
+				Game.instance.getBlocksInArea(
+					this.x,
+					this.collider.y + this.height - 1,
+					this.width,
+					2
+				)
+			);
 
-		if (blockBelowLeft && blockBelowLeft.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockBelowLeft.collider)) {
-				console.log(
-					'Y colliding with block Below',
-					blockBelowLeft,
-					this.collider
-				);
-				this.collider.y -= yChange;
-			}
+		// if any blocksAbove are colliding with player, revert movement
+		if (
+			blocksVertical.some(
+				(block) =>
+					block.type !== BlockType.Empty &&
+					block.collider.isCollidingWith(this.collider)
+			)
+		) {
+			this.collider.y -= yChange;
+			this.collider.y = Math.floor(this.collider.y);
 		}
-		if (blockBelowRight && blockBelowRight.type !== BlockType.Empty) {
-			if (this.collider.isCollidingWith(blockBelowRight.collider)) {
-				console.log(
-					'Y colliding with block Below',
-					blockBelowRight,
-					this.collider
-				);
-				this.collider.y -= yChange;
-			}
-		}
-
-		this.x = this.collider.x;
-		this.y = this.collider.y;
 
 		// gravity
 		this.forceY = lerp(this.forceY, 60, deltaTime * 2);
+
+		// console.log(this.collider.y);
+
+		this.x = this.collider.x;
+		this.y = this.collider.y;
 
 		// Slow down horizontal movement
 		this.forceX *= this.forceDrag;
