@@ -1,4 +1,4 @@
-import Block, { BlockType } from './block';
+import { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
