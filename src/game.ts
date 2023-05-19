@@ -135,13 +135,18 @@ export default class Game {
 		height: number
 	): Block[] {
 		const blocks: Block[] = [];
+		const blockCoords: { x: number; y: number }[] = [];
 
 		// get blocks at world points, check every block size pixels to not waste performance
 		for (let i = x; i < x + width; i += 1) {
 			for (let j = y; j < y + height; j += 1) {
 				const block = this.getBlockAtWorldPoint(i, j);
 
-				if (block) {
+				if (
+					block &&
+					!blockCoords.find((b) => b.x === block.x && b.y === block.y)
+				) {
+					blockCoords.push({ x: block.x, y: block.y });
 					blocks.push(block);
 				}
 			}
