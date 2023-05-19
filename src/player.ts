@@ -74,7 +74,13 @@ export default class Player {
 					this.height
 				)
 			);
-
+		console.log(
+			'top, bottom, left, right',
+			this.collider.y,
+			this.collider.y + this.collider.height,
+			this.collider.x,
+			this.collider.x + this.collider.width
+		);
 		// if any blocksHorizontal are colliding with player, revert movement
 		if (
 			blocksHorizontal.some(
@@ -83,6 +89,14 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
+			console.log(
+				'horizontal',
+				blocksHorizontal.find(
+					(block) =>
+						block.type !== BlockType.Empty &&
+						block.collider.isCollidingWith(this.collider)
+				)
+			);
 			this.collider.x -= xChange;
 			this.collider.x = Math.round(this.collider.x);
 		}
@@ -110,9 +124,20 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
+			// log block im colliding with
+			console.log(
+				'vertical',
+				blocksVertical.find(
+					(block) =>
+						block.type !== BlockType.Empty &&
+						block.collider.isCollidingWith(this.collider)
+				)
+			);
 			this.collider.y -= yChange;
 			this.collider.y = Math.round(this.collider.y);
 		}
+
+		// console.log(blocksHorizontal, blocksVertical);
 
 		// gravity
 		this.forceY = lerp(this.forceY, 60, deltaTime * 2);
