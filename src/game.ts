@@ -137,8 +137,8 @@ export default class Game {
 		const blocks: Block[] = [];
 
 		// get blocks at world points, check every block size pixels to not waste performance
-		for (let i = x; i < x + width; i += Block.size / 2) {
-			for (let j = y; j < y + height; j += Block.size / 2) {
+		for (let i = x; i < x + width; i += 1) {
+			for (let j = y; j < y + height; j += 1) {
 				const block = this.getBlockAtWorldPoint(i, j);
 
 				if (block) {
