@@ -65,10 +65,10 @@ export default class Player {
 		this.collider.x += xChange;
 
 		const blocksHorizontal = Game.instance
-			.getBlocksInArea(this.collider.x - 1, this.y, 2, this.height)
+			.getBlocksInArea(Math.round(this.collider.x) - 1, this.y, 2, this.height)
 			.concat(
 				Game.instance.getBlocksInArea(
-					this.collider.x + this.width - 1,
+					Math.round(this.collider.x) + this.width - 1,
 					this.y,
 					2,
 					this.height
@@ -89,16 +89,14 @@ export default class Player {
 
 		const yChange = this.forceY * deltaTime;
 
-		// console.log('player y+h', this.y + this.height);
-		// console.log(yChange, this.collider.y);dd
 		this.collider.y += yChange;
 
 		const blocksVertical = Game.instance
-			.getBlocksInArea(this.x, this.collider.y - 1, this.width, 2)
+			.getBlocksInArea(this.x, Math.round(this.collider.y) - 1, this.width, 2)
 			.concat(
 				Game.instance.getBlocksInArea(
 					this.x,
-					this.collider.y + this.height - 1,
+					Math.round(this.collider.y) + this.height - 1,
 					this.width,
 					2
 				)
@@ -113,13 +111,11 @@ export default class Player {
 			)
 		) {
 			this.collider.y -= yChange;
-			this.collider.y = Math.floor(this.collider.y);
+			this.collider.y = Math.round(this.collider.y);
 		}
 
 		// gravity
 		this.forceY = lerp(this.forceY, 60, deltaTime * 2);
-
-		// console.log(this.collider.y);
 
 		this.x = this.collider.x;
 		this.y = this.collider.y;
