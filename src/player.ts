@@ -72,13 +72,7 @@ export default class Player {
 			2,
 			this.height
 		);
-		console.log(
-			'top, bottom, left, right',
-			this.collider.y,
-			this.collider.y + this.collider.height,
-			this.collider.x,
-			this.collider.x + this.collider.width
-		);
+
 		// if any horizontal blocks are colliding with player, revert movement
 		if (
 			blocksLeft.some(

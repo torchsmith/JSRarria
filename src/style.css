@@ -19,6 +19,31 @@ body {
 	margin: 0;
 	padding: 0;
 	background-color: #000;
+	cursor: none;
+}
+
+#cursor {
+	/* default cursor: crosshair001.png */
+	/* mining cursor: crosshair013.png */
+
+	background-image: url('/assets/cursors/Outline Retina/crosshair001.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 8px;
+	height: 8px;
+	transform: translate(-50%, -50%);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	pointer-events: none;
+}
+
+#cursor.can-mine {
+	background-image: url('/assets/cursors/Outline Retina/crosshair008.png');
+	width: 40px;
+	height: 24px;
 }
 
 #app {
