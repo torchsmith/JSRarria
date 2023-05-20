@@ -1,4 +1,4 @@
-import { BlockType } from './block';
+import Block, { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
@@ -54,26 +54,24 @@ export default class Player {
 	public update(deltaTime: number): void {
 		this.move();
 
-		// TODO: get closest tile above, below, left, and right of player.
-		// add collider class to tiles.
-		// check if player is colliding with any of those tiles using Collider class.
-		// if player is colliding with any of those tiles revert movement.
-		// do this for both x and y separately to allow for sliding on walls.
+		// Horizontal movement
 
 		const xChange = this.forceX * deltaTime;
 
 		this.collider.x += xChange;
 
-		const blocksHorizontal = Game.instance
-			.getBlocksInArea(Math.round(this.collider.x) - 1, this.y, 2, this.height)
-			.concat(
-				Game.instance.getBlocksInArea(
-					Math.round(this.collider.x) + this.width - 1,
-					this.y,
-					2,
-					this.height
-				)
-			);
+		const blocksLeft = Game.instance.getBlocksInArea(
+			Math.round(this.collider.x) - 1,
+			this.y,
+			2,
+			this.height
+		);
+		const blocksRight = Game.instance.getBlocksInArea(
+			Math.round(this.collider.x) + this.width - 1,
+			this.y,
+			2,
+			this.height
+		);
 		console.log(
 			'top, bottom, left, right',
 			this.collider.y,
@@ -81,67 +79,115 @@ export default class Player {
 			this.collider.x,
 			this.collider.x + this.collider.width
 		);
-		// if any blocksHorizontal are colliding with player, revert movement
+		// if any horizontal blocks are colliding with player, revert movement
 		if (
-			blocksHorizontal.some(
+			blocksLeft.some(
 				(block) =>
 					block.type !== BlockType.Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			console.log(
-				'horizontal',
-				blocksHorizontal.find(
-					(block) =>
-						block.type !== BlockType.Empty &&
-						block.collider.isCollidingWith(this.collider)
-				)
-			);
+			// console.log(
+			// 	'left',
+			// 	blocksLeft.find(
+			// 		(block) =>
+			// 			block.type !== BlockType.Empty &&
+			// 			block.collider.isCollidingWith(this.collider)
+			// 	)
+			// );
 			this.collider.x -= xChange;
-			this.collider.x = Math.round(this.collider.x);
+			this.collider.x = Math.round(this.collider.x / Block.size) * Block.size;
+			this.forceX = 0; // reset forceX when hitting wall
+		} else if (
+			blocksRight.some(
+				(block) =>
+					block.type !== BlockType.Empty &&
+					block.collider.isCollidingWith(this.collider)
+			)
+		) {
+			// console.log(
+			// 	'right',
+			// 	blocksRight.find(
+			// 		(block) =>
+			// 			block.type !== BlockType.Empty &&
+			// 			block.collider.isCollidingWith(this.collider)
+			// 	)
+			// );
+			this.collider.x -= xChange;
+			this.collider.x = Math.round(this.collider.x / Block.size) * Block.size;
+			this.forceX = 0; // reset forceX when hitting wall
 		}
+
+		// Vertical movement
 
 		const yChange = this.forceY * deltaTime;
 
 		this.collider.y += yChange;
 
-		const blocksVertical = Game.instance
-			.getBlocksInArea(this.x, Math.round(this.collider.y) - 1, this.width, 2)
-			.concat(
-				Game.instance.getBlocksInArea(
-					this.x,
-					Math.round(this.collider.y) + this.height - 1,
-					this.width,
-					2
-				)
-			);
+		const blocksAbove = Game.instance.getBlocksInArea(
+			this.x,
+			Math.round(this.collider.y) - 1,
+			this.width,
+			2
+		);
+		const blocksBelow = Game.instance.getBlocksInArea(
+			this.x,
+			Math.round(this.collider.y) + this.height - 1,
+			this.width,
+			2
+		);
 
-		// if any blocksAbove are colliding with player, revert movement
+		// if any vertical blocks are colliding with player, revert movement
 		if (
-			blocksVertical.some(
+			blocksBelow.some(
 				(block) =>
 					block.type !== BlockType.Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			// log block im colliding with
-			console.log(
-				'vertical',
-				blocksVertical.find(
-					(block) =>
-						block.type !== BlockType.Empty &&
-						block.collider.isCollidingWith(this.collider)
-				)
-			);
+			// console.log(
+			// 	'below',
+			// 	blocksBelow.find(
+			// 		(block) =>
+			// 			block.type !== BlockType.Empty &&
+			// 			block.collider.isCollidingWith(this.collider)
+			// 	)
+			// );
 			this.collider.y -= yChange;
-			this.collider.y = Math.round(this.collider.y);
+
+			// snap to block? (round to nearest block)
+			// bad performance ? not sure
+			// seems to work great though (no jittering)
+
+			this.collider.y = Math.round(this.collider.y / Block.size) * Block.size;
+			this.forceY = 0; // reset forceY when hitting ground
+		} else if (
+			blocksAbove.some(
+				(block) =>
+					block.type !== BlockType.Empty &&
+					block.collider.isCollidingWith(this.collider)
+			)
+		) {
+			// console.log(
+			// 	'above',
+			// 	blocksAbove.find(
+			// 		(block) =>
+			// 			block.type !== BlockType.Empty &&
+			// 			block.collider.isCollidingWith(this.collider)
+			// 	)
+			// );
+			this.collider.y -= yChange;
+			this.collider.y = Math.round(this.collider.y / Block.size) * Block.size;
+			this.forceY = 0; // reset forceY when hitting ceiling
+
+			// gravity
+			this.forceY = lerp(this.forceY, 60, deltaTime * 2);
+		} else {
+			// gravity
+			this.forceY = lerp(this.forceY, 60, deltaTime * 2);
 		}
 
-		// console.log(blocksHorizontal, blocksVertical);
-
-		// gravity
-		this.forceY = lerp(this.forceY, 60, deltaTime * 2);
-
+		// set player position after all collider calculations
 		this.x = this.collider.x;
 		this.y = this.collider.y;
 
@@ -168,7 +214,7 @@ export default class Player {
 	}
 
 	public jump(): void {
-		this.forceY = -100;
+		this.forceY = -150;
 	}
 
 	public attack(): void {}
