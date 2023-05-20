@@ -42,8 +42,8 @@ body {
 
 #cursor.can-mine {
 	background-image: url('/assets/cursors/Outline Retina/crosshair008.png');
-	width: 40px;
-	height: 24px;
+	width: 18px;
+	height: 18px;
 }
 
 #app {

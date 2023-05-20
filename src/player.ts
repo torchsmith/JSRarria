@@ -2,7 +2,7 @@ import Block, { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
-import { lerp } from './utils';
+import { distance, lerp } from './utils';
 
 export default class Player {
 	public name = 'Player';
@@ -34,6 +34,45 @@ export default class Player {
 		this.health = this.maxHealth;
 
 		Input.onKeyDown.push([' ', () => this.jump()]);
+		Input.onMouseMove.push(this.onMouseMove.bind(this));
+		Input.onMouseDown.push([0, this.onClick.bind(this)]);
+	}
+
+	private onMouseMove(x: number, y: number): void {
+		const worldPoint = Game.instance.getWorldPointAtScreenPoint(x, y);
+		const block = Game.instance.getBlockAtScreenPoint(x, y);
+
+		if (
+			block &&
+			block.type !== BlockType.Empty &&
+			distance(
+				worldPoint[0],
+				worldPoint[1],
+				this.x + this.width / 2,
+				this.y + this.height / 2
+			) < 56
+		) {
+			Input.cursorElement.classList.add('can-mine');
+		} else {
+			Input.cursorElement.classList.remove('can-mine');
+		}
+	}
+
+	private onClick(x: number, y: number): void {
+		const worldPoint = Game.instance.getWorldPointAtScreenPoint(x, y);
+		const block = Game.instance.getBlockAtScreenPoint(x, y);
+
+		if (
+			block &&
+			distance(
+				worldPoint[0],
+				worldPoint[1],
+				this.x + this.width / 2,
+				this.y + this.height / 2
+			) < 56
+		) {
+			block.setType(BlockType.Empty);
+		}
 	}
 
 	public render(ctx: CanvasRenderingContext2D): void {

@@ -62,7 +62,7 @@ export default class Game {
 
 		Game.instance = this;
 
-		// Create Input singleton instance
+		// Init Input
 		new Input();
 
 		if (stats) {
@@ -79,16 +79,6 @@ export default class Game {
 		this.resize();
 
 		window.addEventListener('resize', this.resize.bind(this));
-
-		this.canvas.addEventListener('click', this.onClick.bind(this));
-	}
-
-	private onClick(e: MouseEvent): void {
-		const block = this.getBlockAtScreenPoint(e.offsetX, e.offsetY);
-
-		if (block) {
-			block.setType(BlockType.Empty);
-		}
 	}
 
 	public getChunk(x: number, y: number): Chunk | undefined {
@@ -107,6 +97,18 @@ export default class Game {
 			x - chunk.x * this.chunkSize,
 			y - chunk.y * this.chunkSize
 		);
+	}
+
+	public getWorldPointAtScreenPoint(
+		x: number,
+		y: number
+	): [x: number, y: number] {
+		const worldX =
+			(x + this.camera.getX() * this.camera.zoom) / this.camera.zoom; // Times zoom because camera is centered
+		const worldY =
+			(y + this.camera.getY() * this.camera.zoom) / this.camera.zoom; // Times zoom because camera is centered
+
+		return [worldX, worldY];
 	}
 
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {

@@ -1,16 +1,16 @@
-import { BlockType } from './block';
-import Game from './game';
-
 export default class Input {
 	public static keys: { [key: string]: boolean } = {};
 	public static mouse: { x: number; y: number } = { x: 0, y: 0 };
 	public static mouseDown: { [key: number]: boolean } = {};
 
+	// onMouseMove delegate function
+	public static onMouseMove: ((x: number, y: number) => void)[] = [];
+
 	// onMouseDown delegate function
-	public static onMouseDown: [number, () => void][] = [];
+	public static onMouseDown: [number, (x: number, y: number) => void][] = [];
 
 	// onMouseUp delegate function
-	public static onMouseUp: [number, () => void][] = [];
+	public static onMouseUp: [number, (x: number, y: number) => void][] = [];
 
 	// onKeyDown delegate function
 	public static onKeyDown: [string, () => void][] = [];
@@ -18,7 +18,7 @@ export default class Input {
 	// onKeyUp delegate function
 	public static onKeyUp: [string, () => void][] = [];
 
-	private static cursorElement: HTMLDivElement;
+	public static cursorElement: HTMLDivElement;
 
 	constructor() {
 		Input.cursorElement = document.getElementById('cursor') as HTMLDivElement;
@@ -34,17 +34,8 @@ export default class Input {
 			Input.cursorElement.style.left = `${e.clientX}px`;
 			Input.cursorElement.style.top = `${e.clientY}px`;
 
-			// TODO: Should I move this logic somewhere else? (below)
-			// TODO: this can't be fast getting a block every frame.
-			// TODO: maybe only do it when the mouse moves a certain distance?
-			// TODO: Make the cursor smooth (saw some examples using GSAP, maybe look into that)
-
-			const block = Game.instance.getBlockAtScreenPoint(e.clientX, e.clientY);
-
-			if (block && block.type !== BlockType.Empty) {
-				Input.cursorElement.classList.add('can-mine');
-			} else {
-				Input.cursorElement.classList.remove('can-mine');
+			for (let i = 0; i < Input.onMouseMove.length; ++i) {
+				Input.onMouseMove[i](e.clientX, e.clientY);
 			}
 		});
 
@@ -54,7 +45,7 @@ export default class Input {
 
 			for (let i = 0; i < Input.onMouseDown.length; ++i) {
 				if (Input.onMouseDown[i][0] === e.button) {
-					Input.onMouseDown[i][1]();
+					Input.onMouseDown[i][1](e.clientX, e.clientY);
 				}
 			}
 		});
@@ -64,7 +55,7 @@ export default class Input {
 
 			for (let i = 0; i < Input.onMouseUp.length; ++i) {
 				if (Input.onMouseUp[i][0] === e.button) {
-					Input.onMouseUp[i][1]();
+					Input.onMouseUp[i][1](e.clientX, e.clientY);
 				}
 			}
 		});
