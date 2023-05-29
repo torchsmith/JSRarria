@@ -2,6 +2,7 @@ import Block, { BlockType } from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
+import Item, { ItemType } from './item';
 import { distance, lerp } from './utils';
 
 export default class Player {
@@ -71,7 +72,16 @@ export default class Player {
 				this.y + this.height / 2
 			) < 56
 		) {
+			if (block.type === BlockType.Empty) return;
 			block.setType(BlockType.Empty);
+			Game.instance.addItem(
+				new Item(
+					ItemType.Block,
+					block.type,
+					block.x + block.collider.width / 2 + Math.random() * 2 - 1,
+					block.y + block.collider.height / 2
+				)
+			);
 		}
 	}
 
@@ -120,14 +130,6 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			// console.log(
-			// 	'left',
-			// 	blocksLeft.find(
-			// 		(block) =>
-			// 			block.type !== BlockType.Empty &&
-			// 			block.collider.isCollidingWith(this.collider)
-			// 	)
-			// );
 			this.collider.x -= xChange;
 			this.collider.x = Math.round(this.collider.x / Block.size) * Block.size;
 			this.forceX = 0; // reset forceX when hitting wall
@@ -138,14 +140,6 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			// console.log(
-			// 	'right',
-			// 	blocksRight.find(
-			// 		(block) =>
-			// 			block.type !== BlockType.Empty &&
-			// 			block.collider.isCollidingWith(this.collider)
-			// 	)
-			// );
 			this.collider.x -= xChange;
 			this.collider.x = Math.round(this.collider.x / Block.size) * Block.size;
 			this.forceX = 0; // reset forceX when hitting wall
@@ -178,14 +172,6 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			// console.log(
-			// 	'below',
-			// 	blocksBelow.find(
-			// 		(block) =>
-			// 			block.type !== BlockType.Empty &&
-			// 			block.collider.isCollidingWith(this.collider)
-			// 	)
-			// );
 			this.collider.y -= yChange;
 
 			// snap to block? (round to nearest block)
@@ -201,14 +187,6 @@ export default class Player {
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
-			// console.log(
-			// 	'above',
-			// 	blocksAbove.find(
-			// 		(block) =>
-			// 			block.type !== BlockType.Empty &&
-			// 			block.collider.isCollidingWith(this.collider)
-			// 	)
-			// );
 			this.collider.y -= yChange;
 			this.collider.y = Math.round(this.collider.y / Block.size) * Block.size;
 			this.forceY = 0; // reset forceY when hitting ceiling

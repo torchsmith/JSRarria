@@ -4,6 +4,7 @@ import Chunk from './chunk';
 import Player from './player';
 import Input from './input';
 import Camera from './camera';
+import Item from './item';
 
 export default class Game {
 	/**
@@ -47,6 +48,11 @@ export default class Game {
 	 * TODO: Add multiplayer support.
 	 */
 	private players: Player[] = [];
+
+	/**
+	 * Items
+	 */
+	private items: Item[] = [];
 
 	/**
 	 * Game loop.
@@ -161,10 +167,10 @@ export default class Game {
 	 * Initialize the game.
 	 */
 	private init(): void {
-		for (let x = 0; x < this.worldWidth; x++) {
+		for (let x = 0; x < this.worldWidth; ++x) {
 			this.chunks.push([]);
 
-			for (let y = 0; y < this.worldHeight; y++) {
+			for (let y = 0; y < this.worldHeight; ++y) {
 				this.chunks[x].push(new Chunk(this.chunkSize, x, y));
 			}
 		}
@@ -184,14 +190,18 @@ export default class Game {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		// Render visible chunks
-		for (let x = 0; x < this.chunks.length; x++) {
-			for (let y = 0; y < this.chunks[x].length; y++) {
+		for (let x = 0; x < this.chunks.length; ++x) {
+			for (let y = 0; y < this.chunks[x].length; ++y) {
 				this.chunks[x][y].render(this.ctx);
 			}
 		}
 
 		// Render player
 		this.players[0].render(this.ctx);
+
+		for (let x = 0; x < this.items.length; ++x) {
+			this.items[x].render(this.ctx);
+		}
 
 		this.stats?.end();
 
@@ -207,11 +217,19 @@ export default class Game {
 		});
 	}
 
+	public addItem(item: Item): void {
+		this.items.push(item);
+	}
+
 	/**
 	 * Update the game. This contains all the game logic.
 	 */
 	private update(deltaTime: number): void {
 		this.players[0].update(deltaTime);
+
+		for (let x = 0; x < this.items.length; ++x) {
+			this.items[x].update(deltaTime);
+		}
 	}
 
 	/**

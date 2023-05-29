@@ -45,6 +45,16 @@ export default class Camera {
 		});
 	}
 
+	public getScreenPointAtWorldPoint(
+		x: number,
+		y: number
+	): [x: number, y: number] {
+		const screenX = x * this.zoom - this.x * this.zoom;
+		const screenY = y * this.zoom - this.y * this.zoom;
+
+		return [screenX, screenY];
+	}
+
 	/**
 	 * Returns the render x coordinate based on the camera position and zoom.
 	 */
