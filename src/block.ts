@@ -1,13 +1,7 @@
 import Chunk from './chunk';
 import Collider from './collider';
 import Game from './game';
-
-export enum BlockType {
-	Empty = 0,
-	Grass = 1,
-	Dirt = 2,
-	Wood = 3,
-}
+import { ItemType } from './item';
 
 /**
  * Controls an individual block.
@@ -19,7 +13,7 @@ export default class Block {
 	public static blockTextureMap: HTMLImageElement[];
 
 	// block type
-	public type: BlockType;
+	public type: ItemType;
 
 	public collider: Collider;
 
@@ -31,7 +25,7 @@ export default class Block {
 
 	public chunk: Chunk;
 
-	constructor(type: BlockType, x: number, y: number, chunk: Chunk) {
+	constructor(type: ItemType, x: number, y: number, chunk: Chunk) {
 		this.type = type;
 		this.gridX = x;
 		this.gridY = y;
@@ -45,18 +39,18 @@ export default class Block {
 		if (!Block.blockTextureMap) {
 			Block.blockTextureMap = [];
 			// Loop through all block types
-			for (let i = 1; i < Object.keys(BlockType).length / 2; ++i) {
+			for (let i = 1; i < Object.keys(ItemType).length / 2; ++i) {
 				Block.blockTextureMap.push(new Image());
 				Block.blockTextureMap[i - 1].src = `./assets/blocks/block-${i}.png`;
 			}
 		}
 	}
 
-	public getType(): BlockType {
+	public getType(): ItemType {
 		return this.type;
 	}
 
-	public setType(type: BlockType): void {
+	public setType(type: ItemType): void {
 		this.type = type;
 	}
 
@@ -81,7 +75,7 @@ export default class Block {
 	}
 
 	public render(ctx: CanvasRenderingContext2D): void {
-		if (this.type === BlockType.Empty) return;
+		if (this.type === ItemType.B_Empty) return;
 
 		const blockAbove = Game.instance.getBlock(this.gridX, this.gridY - 1);
 		const blockBelow = Game.instance.getBlock(this.gridX, this.gridY + 1);
@@ -161,13 +155,13 @@ export default class Block {
 			return mat[0].every((val, i) => {
 				switch (i) {
 					case 0:
-						return val === (blockAbove?.type !== BlockType.Empty ? 1 : 0);
+						return val === (blockAbove?.type !== ItemType.B_Empty ? 1 : 0);
 					case 1:
-						return val === (blockRight?.type !== BlockType.Empty ? 1 : 0);
+						return val === (blockRight?.type !== ItemType.B_Empty ? 1 : 0);
 					case 2:
-						return val === (blockBelow?.type !== BlockType.Empty ? 1 : 0);
+						return val === (blockBelow?.type !== ItemType.B_Empty ? 1 : 0);
 					case 3:
-						return val === (blockLeft?.type !== BlockType.Empty ? 1 : 0);
+						return val === (blockLeft?.type !== ItemType.B_Empty ? 1 : 0);
 				}
 
 				return false;

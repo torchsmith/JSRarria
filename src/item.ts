@@ -1,21 +1,21 @@
-import Block, { BlockType } from './block';
+import Block from './block';
 import Collider from './collider';
 import Game from './game';
+import { distance, lerp } from './utils';
 
 export enum ItemType {
-	Block,
-	Weapon,
+	B_Empty,
+	B_Grass,
+	B_Dirt,
+	B_Wood,
 }
 
-// Right now an "item" is just a dropped entity in the world.
-
 /**
- * Controls an individual block.
+ * A dropped entity in the world
  */
 export default class Item {
 	// item type
 	public type: ItemType;
-	public subtype: BlockType; // this can become a union type later. // try to base what this is on type (above)
 
 	public collider: Collider;
 
@@ -51,9 +51,8 @@ export default class Item {
 		this.collider.height = height;
 	}
 
-	constructor(type: ItemType, subtype: BlockType, x: number, y: number) {
+	constructor(type: ItemType, x: number, y: number) {
 		this.type = type;
-		this.subtype = subtype;
 
 		const size = Block.size * 0.7;
 		const halfSize = size / 2;
@@ -62,7 +61,7 @@ export default class Item {
 	}
 
 	public toString(): string {
-		return `Item: ${this.type}, ${this.subtype} X: ${this.x} Y: ${this.y}`;
+		return `Item: ${this.type} X: ${this.x} Y: ${this.y}`;
 	}
 
 	public render(ctx: CanvasRenderingContext2D): void {
@@ -96,7 +95,7 @@ export default class Item {
 		ctx.translate(-center[0], -center[1]);
 
 		ctx.drawImage(
-			Block.blockTextureMap[this.subtype],
+			Block.blockTextureMap[this.type],
 			coords[0] * 9,
 			coords[1] * 9,
 			Block.size,
@@ -112,8 +111,20 @@ export default class Item {
 	}
 
 	public update(deltaTime: number): void {
-		// gravity
-		this.y += 40 * deltaTime;
+		const player = Game.instance.getPlayer(0);
+		const distanceToPlayer = distance(player.midX, player.midY, this.x, this.y);
+		if (distanceToPlayer < 100) {
+			if (distanceToPlayer < 6) {
+				player.addToInventory(this.type, 1);
+				Game.instance.deleteItem(this);
+				return;
+			}
+			this.x = lerp(this.x, player.midX, deltaTime * 10);
+			this.y = lerp(this.y, player.midY, deltaTime * 10);
+		} else {
+			// gravity
+			this.y += 40 * deltaTime;
+		}
 
 		// collision
 		const blockBelow = Game.instance.getBlockAtWorldPoint(
@@ -121,7 +132,7 @@ export default class Item {
 			this.y + this.height + 1
 		);
 
-		if (blockBelow && blockBelow.type !== BlockType.Empty) {
+		if (blockBelow && blockBelow.type !== ItemType.B_Empty) {
 			this.y = blockBelow.y - this.height;
 		}
 	}

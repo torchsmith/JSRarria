@@ -1,4 +1,4 @@
-import Block, { BlockType } from './block';
+import Block from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
@@ -16,11 +16,29 @@ export default class Player {
 	public x;
 	public y;
 
+	get right(): number {
+		return this.x + this.width;
+	}
+
+	get bottom(): number {
+		return this.y + this.height;
+	}
+
+	get midX(): number {
+		return this.x + this.width / 2;
+	}
+
+	get midY(): number {
+		return this.y + this.height / 2;
+	}
+
 	public forceX = 0;
 	public forceY = 0;
 
 	private forceDrag = 0.9;
 	private collider: Collider;
+
+	private inventory: { [key: number]: number } = {};
 
 	constructor(spawnX: number, spawnY: number) {
 		this.x = spawnX;
@@ -29,6 +47,41 @@ export default class Player {
 		this.collider = new Collider(this.x, this.y, this.width, this.height);
 
 		this.init();
+	}
+
+	public addToInventory(item: ItemType, count: number) {
+		if (!this.inventory[item]) {
+			this.inventory[item] = count;
+			return;
+		}
+
+		this.inventory[item] += count;
+
+		let logInventory: any = {};
+		for (const key in this.inventory) {
+			logInventory[ItemType[key]] = this.inventory[key];
+		}
+
+		console.table(logInventory);
+	}
+
+	public removeFromInventory(item: ItemType, count: number) {
+		if (!this.inventory[item]) {
+			return false;
+		}
+
+		this.inventory[item] -= count;
+
+		if (this.inventory[item] <= 0) delete this.inventory[item];
+
+		let logInventory: any = {};
+		for (const key in this.inventory) {
+			logInventory[ItemType[key]] = this.inventory[key];
+		}
+
+		console.table(logInventory);
+
+		return true;
 	}
 
 	private init(): void {
@@ -45,7 +98,7 @@ export default class Player {
 
 		if (
 			block &&
-			block.type !== BlockType.Empty &&
+			block.type !== ItemType.B_Empty &&
 			distance(
 				worldPoint[0],
 				worldPoint[1],
@@ -72,16 +125,15 @@ export default class Player {
 				this.y + this.height / 2
 			) < 56
 		) {
-			if (block.type === BlockType.Empty) return;
-			block.setType(BlockType.Empty);
+			if (block.type === ItemType.B_Empty) return;
 			Game.instance.addItem(
 				new Item(
-					ItemType.Block,
 					block.type,
 					block.x + block.collider.width / 2 + Math.random() * 2 - 1,
 					block.y + block.collider.height / 2
 				)
 			);
+			block.setType(ItemType.B_Empty);
 		}
 	}
 
@@ -126,7 +178,7 @@ export default class Player {
 		if (
 			blocksLeft.some(
 				(block) =>
-					block.type !== BlockType.Empty &&
+					block.type !== ItemType.B_Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
@@ -136,7 +188,7 @@ export default class Player {
 		} else if (
 			blocksRight.some(
 				(block) =>
-					block.type !== BlockType.Empty &&
+					block.type !== ItemType.B_Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
@@ -168,7 +220,7 @@ export default class Player {
 		if (
 			blocksBelow.some(
 				(block) =>
-					block.type !== BlockType.Empty &&
+					block.type !== ItemType.B_Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {
@@ -183,7 +235,7 @@ export default class Player {
 		} else if (
 			blocksAbove.some(
 				(block) =>
-					block.type !== BlockType.Empty &&
+					block.type !== ItemType.B_Empty &&
 					block.collider.isCollidingWith(this.collider)
 			)
 		) {

@@ -1,4 +1,4 @@
-import Block, { BlockType } from './block';
+import Block from './block';
 import Stats from 'stats.js';
 import Chunk from './chunk';
 import Player from './player';
@@ -85,6 +85,10 @@ export default class Game {
 		this.resize();
 
 		window.addEventListener('resize', this.resize.bind(this));
+	}
+
+	public getPlayer(id: number) {
+		return this.players[id];
 	}
 
 	public getChunk(x: number, y: number): Chunk | undefined {
@@ -217,8 +221,22 @@ export default class Game {
 		});
 	}
 
+	/**
+	 * Add item to the world
+	 */
 	public addItem(item: Item): void {
 		this.items.push(item);
+	}
+
+	/**
+	 * Delete item from the world
+	 */
+	public deleteItem(item: Item): void {
+		const index = this.items.indexOf(item);
+
+		if (index > -1) {
+			this.items.splice(index, 1);
+		}
 	}
 
 	/**

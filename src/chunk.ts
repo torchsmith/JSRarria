@@ -1,5 +1,6 @@
-import Block, { BlockType } from './block';
+import Block from './block';
 import Game from './game';
+import { ItemType } from './item';
 
 /**
  * Controls a chunk of blocks.
@@ -76,15 +77,15 @@ export default class Chunk {
 
 				if (y < height)
 					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Empty, x, y, this)
+						new Block(ItemType.B_Empty, x, y, this)
 					);
 				else if (y > height)
 					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Dirt, x, y, this)
+						new Block(ItemType.B_Dirt, x, y, this)
 					);
 				else
 					this.blocks[x - this.x * size].push(
-						new Block(BlockType.Grass, x, height, this)
+						new Block(ItemType.B_Grass, x, height, this)
 					);
 			}
 		}
