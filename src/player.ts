@@ -2,8 +2,11 @@ import Block from './block';
 import Collider from './collider';
 import Game from './game';
 import Input from './input';
-import Item, { ItemType } from './item';
+import Item, { ItemType, ItemTypeEnum } from './item';
+import UI from './ui';
 import { distance, lerp } from './utils';
+
+export type Inventory = { [key in ItemTypeEnum]?: number };
 
 export default class Player {
 	public name = 'Player';
@@ -38,7 +41,7 @@ export default class Player {
 	private forceDrag = 0.9;
 	private collider: Collider;
 
-	private inventory: { [key: number]: number } = {};
+	private inventory: Inventory = {};
 
 	constructor(spawnX: number, spawnY: number) {
 		this.x = spawnX;
@@ -49,38 +52,28 @@ export default class Player {
 		this.init();
 	}
 
-	public addToInventory(item: ItemType, count: number) {
+	public addToInventory(item: ItemTypeEnum, count: number) {
 		if (!this.inventory[item]) {
 			this.inventory[item] = count;
+			UI.instance.updateInventory(this.inventory);
 			return;
 		}
 
-		this.inventory[item] += count;
-
-		let logInventory: any = {};
-		for (const key in this.inventory) {
-			logInventory[ItemType[key]] = this.inventory[key];
-		}
-
-		console.table(logInventory);
+		this.inventory[item]! += count;
+		UI.instance.updateInventory(this.inventory);
 	}
 
-	public removeFromInventory(item: ItemType, count: number) {
+	public removeFromInventory(item: ItemTypeEnum, count: number) {
 		if (!this.inventory[item]) {
+			UI.instance.updateInventory(this.inventory);
 			return false;
 		}
 
-		this.inventory[item] -= count;
+		this.inventory[item]! -= count;
 
-		if (this.inventory[item] <= 0) delete this.inventory[item];
+		if (this.inventory[item]! <= 0) delete this.inventory[item];
 
-		let logInventory: any = {};
-		for (const key in this.inventory) {
-			logInventory[ItemType[key]] = this.inventory[key];
-		}
-
-		console.table(logInventory);
-
+		UI.instance.updateInventory(this.inventory);
 		return true;
 	}
 

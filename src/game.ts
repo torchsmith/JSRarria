@@ -5,6 +5,7 @@ import Player from './player';
 import Input from './input';
 import Camera from './camera';
 import Item from './item';
+import UI from './ui';
 
 export default class Game {
 	/**
@@ -68,6 +69,9 @@ export default class Game {
 
 		Game.instance = this;
 
+		// Init UI
+		new UI();
+
 		// Init Input
 		new Input();
 
@@ -119,6 +123,16 @@ export default class Game {
 			(y + this.camera.getY() * this.camera.zoom) / this.camera.zoom; // Times zoom because camera is centered
 
 		return [worldX, worldY];
+	}
+
+	public getScreenPointAtWorldPoint(
+		x: number,
+		y: number
+	): [x: number, y: number] {
+		const screenX = (x - this.camera.getX()) * this.camera.zoom; // Times zoom because camera is centered
+		const screenY = (y - this.camera.getY()) * this.camera.zoom; // Times zoom because camera is centered
+
+		return [screenX, screenY];
 	}
 
 	public getBlockAtScreenPoint(x: number, y: number): Block | undefined {

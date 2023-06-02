@@ -1,7 +1,7 @@
 import Chunk from './chunk';
 import Collider from './collider';
 import Game from './game';
-import { ItemType } from './item';
+import { ItemType, ItemTypeEnum } from './item';
 
 /**
  * Controls an individual block.
@@ -13,7 +13,7 @@ export default class Block {
 	public static blockTextureMap: HTMLImageElement[];
 
 	// block type
-	public type: ItemType;
+	public type: ItemTypeEnum;
 
 	public collider: Collider;
 
@@ -25,7 +25,7 @@ export default class Block {
 
 	public chunk: Chunk;
 
-	constructor(type: ItemType, x: number, y: number, chunk: Chunk) {
+	constructor(type: ItemTypeEnum, x: number, y: number, chunk: Chunk) {
 		this.type = type;
 		this.gridX = x;
 		this.gridY = y;
@@ -39,18 +39,18 @@ export default class Block {
 		if (!Block.blockTextureMap) {
 			Block.blockTextureMap = [];
 			// Loop through all block types
-			for (let i = 1; i < Object.keys(ItemType).length / 2; ++i) {
+			for (let i = 1; i < Object.keys(ItemType).length; ++i) {
 				Block.blockTextureMap.push(new Image());
 				Block.blockTextureMap[i - 1].src = `./assets/blocks/block-${i}.png`;
 			}
 		}
 	}
 
-	public getType(): ItemType {
+	public getType(): ItemTypeEnum {
 		return this.type;
 	}
 
-	public setType(type: ItemType): void {
+	public setType(type: ItemTypeEnum): void {
 		this.type = type;
 	}
 

@@ -1,13 +1,48 @@
 import Block from './block';
 import Collider from './collider';
 import Game from './game';
+import UI from './ui';
 import { distance, lerp } from './utils';
 
-export enum ItemType {
-	B_Empty,
-	B_Grass,
-	B_Dirt,
-	B_Wood,
+export const ItemType = {
+	B_Empty: 0,
+	B_Grass: 1,
+	B_Dirt: 2,
+	B_Wood: 3,
+} as const;
+
+type ValueOf<T> = T[keyof T];
+
+export type ItemTypeEnum = ValueOf<typeof ItemType>;
+
+export function getItemTypeKeyById(id: number): string | false {
+	switch (id) {
+		case ItemType.B_Empty:
+			return 'B_Empty';
+		case ItemType.B_Grass:
+			return 'B_Grass';
+		case ItemType.B_Dirt:
+			return 'B_Dirt';
+		case ItemType.B_Wood:
+			return 'B_Wood';
+		default:
+			return false;
+	}
+}
+
+export function getItemTypeName(itemType: ItemTypeEnum) {
+	switch (itemType) {
+		case ItemType.B_Empty:
+			return 'Empty';
+		case ItemType.B_Grass:
+			return 'Grass';
+		case ItemType.B_Dirt:
+			return 'Dirt';
+		case ItemType.B_Wood:
+			return 'Wood';
+		default:
+			return 'Unknown';
+	}
 }
 
 /**
@@ -15,7 +50,7 @@ export enum ItemType {
  */
 export default class Item {
 	// item type
-	public type: ItemType;
+	public type: ItemTypeEnum;
 
 	public collider: Collider;
 
@@ -51,7 +86,7 @@ export default class Item {
 		this.collider.height = height;
 	}
 
-	constructor(type: ItemType, x: number, y: number) {
+	constructor(type: ItemTypeEnum, x: number, y: number) {
 		this.type = type;
 
 		const size = Block.size * 0.7;
@@ -115,6 +150,17 @@ export default class Item {
 		const distanceToPlayer = distance(player.midX, player.midY, this.x, this.y);
 		if (distanceToPlayer < 100) {
 			if (distanceToPlayer < 6) {
+				const posAtScreenPoint = Game.instance.getScreenPointAtWorldPoint(
+					this.x,
+					this.y
+				);
+
+				UI.instance.spawnText(
+					`+1 ${getItemTypeName(this.type)}`,
+					posAtScreenPoint[0],
+					posAtScreenPoint[1],
+					'#ffffff'
+				);
 				player.addToInventory(this.type, 1);
 				Game.instance.deleteItem(this);
 				return;

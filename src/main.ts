@@ -1,8 +1,8 @@
-import './style.css';
+import './style.scss';
 
 import Game from './game';
 
-const game = new Game(true);
+const game = new Game(false);
 
 game.start();
 
