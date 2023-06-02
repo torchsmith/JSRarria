@@ -29,6 +29,7 @@ export default class UI {
 		const textElement = document.createElement('div');
 		textElement.classList.add('text');
 		textElement.style.color = color;
+		textElement.style.webkitTextFillColor = color;
 		textElement.style.left = `${x}px`;
 		textElement.style.top = `${y}px`;
 		textElement.innerText = text;
