@@ -19,8 +19,11 @@ body {
 	margin: 0;
 	padding: 0;
 	background-color: #000;
-	cursor: none;
 	overflow: hidden;
+}
+
+* {
+	cursor: none;
 }
 
 #cursor {
@@ -69,22 +72,50 @@ body {
 		position: absolute;
 		top: 20px;
 		left: 20px;
-		display: flex;
+		display: none;
 		justify-content: start;
 		align-items: start;
 		flex-direction: column;
-		gap: 4px;
-		padding: 0 8px;
+		padding: 8px;
 		transition: all 0.25s ease;
 		background-color: rgba(0, 0, 0, 0.5);
 		border-radius: 3px;
 		border: 1px solid rgba(255, 255, 255, 0.5);
 
 		.item {
-			padding: 8px 0;
-			&:not(:last-child) {
-				border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+			padding: 8px;
+			border-radius: 3px;
+			position: relative;
+			border: none;
+			background: rgba(255,255,255,0.5);
+			color: #000;
+			font-weight: 900;
+			transition: all 0.25s ease;
+
+			&:not(.selected) {
+				&:hover {
+					background-color: rgba(255, 255, 255, 0.75);
+				}
+
+				&:active {
+					transform: scale(0.9);
+				}
 			}
+
+			&.selected {
+				background-color: rgba(255, 255, 255, 1);
+			}
+		}
+
+		.divider {
+			margin: 3px 0;
+			height: 2px;
+			width: 100%;
+			background: rgba(255, 255, 255, 0.5);
+		}
+
+		&.open {
+			display: flex;
 		}
 	}
 

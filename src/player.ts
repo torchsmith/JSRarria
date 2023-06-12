@@ -42,6 +42,8 @@ export default class Player {
 	private collider: Collider;
 
 	private inventory: Inventory = {};
+	private inventoryOpen = false;
+	public selectedItem: ItemTypeEnum | false = false;
 
 	constructor(spawnX: number, spawnY: number) {
 		this.x = spawnX;
@@ -55,17 +57,17 @@ export default class Player {
 	public addToInventory(item: ItemTypeEnum, count: number) {
 		if (!this.inventory[item]) {
 			this.inventory[item] = count;
-			UI.instance.updateInventory(this.inventory);
+			UI.instance.updateInventory(this.inventory, this);
 			return;
 		}
 
 		this.inventory[item]! += count;
-		UI.instance.updateInventory(this.inventory);
+		UI.instance.updateInventory(this.inventory, this);
 	}
 
 	public removeFromInventory(item: ItemTypeEnum, count: number) {
 		if (!this.inventory[item]) {
-			UI.instance.updateInventory(this.inventory);
+			UI.instance.updateInventory(this.inventory, this);
 			return false;
 		}
 
@@ -73,8 +75,28 @@ export default class Player {
 
 		if (this.inventory[item]! <= 0) delete this.inventory[item];
 
-		UI.instance.updateInventory(this.inventory);
+		UI.instance.updateInventory(this.inventory, this);
 		return true;
+	}
+
+	private openInventory(): void {
+		this.inventoryOpen = true;
+		UI.instance.openInventory();
+	}
+
+	private closeInventory(): void {
+		this.inventoryOpen = false;
+		UI.instance.closeInventory();
+	}
+
+	private toggleInventory(): void {
+		this.inventoryOpen = !this.inventoryOpen;
+		UI.instance.toggleInventory();
+	}
+
+	public selectItem(item: ItemTypeEnum | false): void {
+		this.selectedItem = item;
+		UI.instance.selectItem(item);
 	}
 
 	private init(): void {
@@ -83,6 +105,9 @@ export default class Player {
 		Input.onKeyDown.push([' ', () => this.jump()]);
 		Input.onMouseMove.push(this.onMouseMove.bind(this));
 		Input.onMouseDown.push([0, this.onClick.bind(this)]);
+		Input.onMouseDown.push([2, this.onRightClick.bind(this)]);
+		
+		Input.onKeyDown.push(['e', () => this.toggleInventory()]);
 	}
 
 	private onMouseMove(x: number, y: number): void {
@@ -127,6 +152,45 @@ export default class Player {
 				)
 			);
 			block.setType(ItemType.B_Empty);
+		}
+	}
+
+	private onRightClick(x: number, y: number): void {
+
+		if(!this.selectedItem) return;
+
+		const worldPoint = Game.instance.getWorldPointAtScreenPoint(x, y);
+		const block = Game.instance.getBlockAtScreenPoint(x, y);
+
+		if (
+			block &&
+			distance(
+				worldPoint[0],
+				worldPoint[1],
+				this.x + this.width / 2,
+				this.y + this.height / 2
+			) < 56
+		) {
+			if (block.type !== ItemType.B_Empty) return;
+			if(this.inventory[this.selectedItem] === undefined) return;
+
+			const blockUp = Game.instance.getBlock(block.gridX, block.gridY - 1);
+			const blockDown = Game.instance.getBlock(block.gridX, block.gridY + 1);
+			const blockLeft = Game.instance.getBlock(block.gridX - 1, block.gridY);
+			const blockRight = Game.instance.getBlock(block.gridX + 1, block.gridY);
+
+			if(blockUp === undefined || blockDown === undefined || blockLeft === undefined || blockRight === undefined) return;
+
+			// if all blocks around are empty then return
+			if(
+				blockUp.type === ItemType.B_Empty &&
+				blockDown.type === ItemType.B_Empty &&
+				blockLeft.type === ItemType.B_Empty &&
+				blockRight.type === ItemType.B_Empty
+			) return;
+
+			if(!this.removeFromInventory(this.selectedItem, 1)) return;
+			block.setType(this.selectedItem);
 		}
 	}
 

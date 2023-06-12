@@ -1,10 +1,9 @@
 import {
-	ItemType,
 	getItemTypeName,
 	getItemTypeKeyById,
 	ItemTypeEnum,
 } from './item';
-import { Inventory } from './player';
+import Player, { Inventory } from './player';
 
 export default class UI {
 	public static instance: UI;
@@ -49,13 +48,15 @@ export default class UI {
 			this.ui.removeChild(textElement);
 		}, duration + 250);
 	}
-
-	public updateInventory(inventory: Inventory): void {
+ 
+	public updateInventory(inventory: Inventory, player: Player): void {
 		this.inventory.innerHTML = '';
 
-		for (const key in inventory) {
-			const item = document.createElement('div');
+		Object.keys(inventory).forEach((key, index, arr) => {
+			const item = document.createElement('button');
 			item.classList.add('item');
+
+			if(player.selectedItem === Number(key)) item.classList.add('selected');
 
 			const keyAsItemTypeEnum = Number(key) as ItemTypeEnum;
 
@@ -64,6 +65,50 @@ export default class UI {
 			}`;
 
 			this.inventory.appendChild(item);
-		}
+
+			if(index !== arr.length - 1) {
+				const divider = document.createElement('div');
+				divider.classList.add('divider');
+				this.inventory.appendChild(divider);
+			}
+
+			item.addEventListener('click', () => {
+				const itemType = getItemTypeKeyById(keyAsItemTypeEnum);
+
+				if (!itemType) return;
+
+				player.selectItem(keyAsItemTypeEnum);
+			});
+		});
+	}
+
+	public selectItem(item: ItemTypeEnum | false): void {
+		const items = document.querySelectorAll('.item');
+
+		items.forEach((itemElement) => {
+			itemElement.classList.remove('selected');
+		});
+
+		if(!item) return;
+
+		const itemElement = document.querySelector(
+			`.item:nth-of-type(${item})`
+		);
+
+		if (!itemElement) return;
+
+		itemElement.classList.add('selected');
+	}
+
+	public openInventory(): void {
+		this.inventory.classList.add('open');
+	}
+
+	public closeInventory(): void {
+		this.inventory.classList.remove('open');
+	}
+
+	public toggleInventory(): void {
+		this.inventory.classList.toggle('open');
 	}
 }
