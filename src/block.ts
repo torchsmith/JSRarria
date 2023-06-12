@@ -43,6 +43,8 @@ export default class Block {
 				Block.blockTextureMap.push(new Image());
 				Block.blockTextureMap[i - 1].src = `./assets/blocks/block-${i}.png`;
 			}
+
+			console.log(Block.blockTextureMap);
 		}
 	}
 
@@ -169,7 +171,7 @@ export default class Block {
 		})?.[1] || [0, 0];
 
 		ctx.drawImage(
-			Block.blockTextureMap[this.type],
+			Block.blockTextureMap[this.type - 1],
 			coords[0] * 9,
 			coords[1] * 9,
 			Block.size,
