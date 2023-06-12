@@ -20,6 +20,7 @@ body {
 	padding: 0;
 	background-color: #000;
 	cursor: none;
+	overflow: hidden;
 }
 
 #cursor {
@@ -52,6 +53,7 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 }
 
 #ui {
