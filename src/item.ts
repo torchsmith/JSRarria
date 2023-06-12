@@ -4,6 +4,7 @@ import Game from './game';
 import UI from './ui';
 import { distance, lerp } from './utils';
 
+// ADD BUT DO NOT CHANGE ORDER OR REMOVE ANYTHING FROM THIS ENUM
 export const ItemType = {
 	B_Empty: 0,
 	B_Grass: 1,
