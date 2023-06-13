@@ -1,16 +1,24 @@
 import { getItemTypeName, getItemTypeKeyById, ItemTypeEnum } from './item';
 import Player, { Inventory } from './player';
+import { render } from 'solid-js/web';
+import { createSignal } from 'solid-js';
+import UIView from './ui/UIView';
 
 export default class UI {
 	public static instance: UI;
 
 	private ui = document.getElementById('ui')!;
 	private inventory = document.getElementById('inventory')!;
+	private inventorySignal;
 
 	constructor() {
 		if (UI.instance) throw new Error('UI is a singleton');
 
 		UI.instance = this;
+
+		this.inventorySignal = createSignal<Inventory>({ 1: 10, 2: 5 });
+
+		render(() => UIView({ inventory: this.inventorySignal[0] }), this.ui);
 	}
 
 	public spawnText(
