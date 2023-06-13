@@ -1,8 +1,4 @@
-import {
-	getItemTypeName,
-	getItemTypeKeyById,
-	ItemTypeEnum,
-} from './item';
+import { getItemTypeName, getItemTypeKeyById, ItemTypeEnum } from './item';
 import Player, { Inventory } from './player';
 
 export default class UI {
@@ -48,7 +44,7 @@ export default class UI {
 			this.ui.removeChild(textElement);
 		}, duration + 250);
 	}
- 
+
 	public updateInventory(inventory: Inventory, player: Player): void {
 		this.inventory.innerHTML = '';
 
@@ -56,7 +52,7 @@ export default class UI {
 			const item = document.createElement('button');
 			item.classList.add('item');
 
-			if(player.selectedItem === Number(key)) item.classList.add('selected');
+			if (player.selectedItem === Number(key)) item.classList.add('selected');
 
 			const keyAsItemTypeEnum = Number(key) as ItemTypeEnum;
 
@@ -66,7 +62,7 @@ export default class UI {
 
 			this.inventory.appendChild(item);
 
-			if(index !== arr.length - 1) {
+			if (index !== arr.length - 1) {
 				const divider = document.createElement('div');
 				divider.classList.add('divider');
 				this.inventory.appendChild(divider);
@@ -89,11 +85,9 @@ export default class UI {
 			itemElement.classList.remove('selected');
 		});
 
-		if(!item) return;
+		if (!item) return;
 
-		const itemElement = document.querySelector(
-			`.item:nth-of-type(${item})`
-		);
+		const itemElement = document.querySelector(`.item:nth-of-type(${item})`);
 
 		if (!itemElement) return;
 

@@ -106,7 +106,7 @@ export default class Player {
 		Input.onMouseMove.push(this.onMouseMove.bind(this));
 		Input.onMouseDown.push([0, this.onClick.bind(this)]);
 		Input.onMouseDown.push([2, this.onRightClick.bind(this)]);
-		
+
 		Input.onKeyDown.push(['e', () => this.toggleInventory()]);
 	}
 
@@ -156,8 +156,7 @@ export default class Player {
 	}
 
 	private onRightClick(x: number, y: number): void {
-
-		if(!this.selectedItem) return;
+		if (!this.selectedItem) return;
 
 		const worldPoint = Game.instance.getWorldPointAtScreenPoint(x, y);
 		const block = Game.instance.getBlockAtScreenPoint(x, y);
@@ -172,24 +171,31 @@ export default class Player {
 			) < 56
 		) {
 			if (block.type !== ItemType.B_Empty) return;
-			if(this.inventory[this.selectedItem] === undefined) return;
+			if (this.inventory[this.selectedItem] === undefined) return;
 
 			const blockUp = Game.instance.getBlock(block.gridX, block.gridY - 1);
 			const blockDown = Game.instance.getBlock(block.gridX, block.gridY + 1);
 			const blockLeft = Game.instance.getBlock(block.gridX - 1, block.gridY);
 			const blockRight = Game.instance.getBlock(block.gridX + 1, block.gridY);
 
-			if(blockUp === undefined || blockDown === undefined || blockLeft === undefined || blockRight === undefined) return;
+			if (
+				blockUp === undefined ||
+				blockDown === undefined ||
+				blockLeft === undefined ||
+				blockRight === undefined
+			)
+				return;
 
 			// if all blocks around are empty then return
-			if(
+			if (
 				blockUp.type === ItemType.B_Empty &&
 				blockDown.type === ItemType.B_Empty &&
 				blockLeft.type === ItemType.B_Empty &&
 				blockRight.type === ItemType.B_Empty
-			) return;
+			)
+				return;
 
-			if(!this.removeFromInventory(this.selectedItem, 1)) return;
+			if (!this.removeFromInventory(this.selectedItem, 1)) return;
 			block.setType(this.selectedItem);
 		}
 	}
