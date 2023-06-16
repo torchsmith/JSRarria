@@ -1,24 +1,31 @@
-import { getItemTypeName, getItemTypeKeyById, ItemTypeEnum } from './item';
+import { ItemTypeEnum } from './item';
 import Player, { Inventory } from './player';
 import { render } from 'solid-js/web';
-import { createSignal } from 'solid-js';
+import { createStore } from 'solid-js/store';
 import UIView from './ui/UIView';
+
+export type InventoryStore = {
+	inventory: Inventory;
+	open: boolean;
+};
 
 export default class UI {
 	public static instance: UI;
 
 	private ui = document.getElementById('ui')!;
-	private inventory = document.getElementById('inventory')!;
-	private inventorySignal;
+	private inventoryStore;
 
 	constructor() {
 		if (UI.instance) throw new Error('UI is a singleton');
 
 		UI.instance = this;
 
-		this.inventorySignal = createSignal<Inventory>({ 1: 10, 2: 5 });
+		this.inventoryStore = createStore<InventoryStore>({
+			inventory: {},
+			open: false,
+		});
 
-		render(() => UIView({ inventory: this.inventorySignal[0] }), this.ui);
+		render(() => UIView({ inventory: this.inventoryStore }), this.ui);
 	}
 
 	public spawnText(
@@ -54,63 +61,63 @@ export default class UI {
 	}
 
 	public updateInventory(inventory: Inventory, player: Player): void {
-		this.inventory.innerHTML = '';
+		this.inventoryStore[1]({ inventory: inventory });
 
-		Object.keys(inventory).forEach((key, index, arr) => {
-			const item = document.createElement('button');
-			item.classList.add('item');
+		// this.inventory.innerHTML = '';
 
-			if (player.selectedItem === Number(key)) item.classList.add('selected');
+		// Object.keys(inventory).forEach((key, index, arr) => {
+		// 	const item = document.createElement('button');
+		// 	item.classList.add('item');
 
-			const keyAsItemTypeEnum = Number(key) as ItemTypeEnum;
+		// 	if (player.selectedItem === Number(key)) item.classList.add('selected');
 
-			item.innerText = `${getItemTypeName(keyAsItemTypeEnum)}: ${
-				inventory[keyAsItemTypeEnum]
-			}`;
+		// 	const keyAsItemTypeEnum = Number(key) as ItemTypeEnum;
 
-			this.inventory.appendChild(item);
+		// 	item.innerText = `${getItemTypeName(keyAsItemTypeEnum)}: ${
+		// 		inventory[keyAsItemTypeEnum]
+		// 	}`;
 
-			if (index !== arr.length - 1) {
-				const divider = document.createElement('div');
-				divider.classList.add('divider');
-				this.inventory.appendChild(divider);
-			}
+		// 	this.inventory.appendChild(item);
 
-			item.addEventListener('click', () => {
-				const itemType = getItemTypeKeyById(keyAsItemTypeEnum);
+		// 	if (index !== arr.length - 1) {
+		// 		const divider = document.createElement('div');
+		// 		divider.classList.add('divider');
+		// 		this.inventory.appendChild(divider);
+		// 	}
 
-				if (!itemType) return;
+		// 	item.addEventListener('click', () => {
+		// 		const itemType = getItemTypeKeyById(keyAsItemTypeEnum);
 
-				player.selectItem(keyAsItemTypeEnum);
-			});
-		});
+		// 		if (!itemType) return;
+
+		// 		player.selectItem(keyAsItemTypeEnum);
+		// 	});
+		// });
 	}
 
 	public selectItem(item: ItemTypeEnum | false): void {
-		const items = document.querySelectorAll('.item');
-
-		items.forEach((itemElement) => {
-			itemElement.classList.remove('selected');
-		});
-
-		if (!item) return;
-
-		const itemElement = document.querySelector(`.item:nth-of-type(${item})`);
-
-		if (!itemElement) return;
-
-		itemElement.classList.add('selected');
+		// const items = document.querySelectorAll('.item');
+		// items.forEach((itemElement) => {
+		// 	itemElement.classList.remove('selected');
+		// });
+		// if (!item) return;
+		// const itemElement = document.querySelector(`.item:nth-of-type(${item})`);
+		// if (!itemElement) return;
+		// itemElement.classList.add('selected');
 	}
 
 	public openInventory(): void {
-		this.inventory.classList.add('open');
+		this.inventoryStore[1]({ open: true });
+		// this.inventory.classList.add('open');
 	}
 
 	public closeInventory(): void {
-		this.inventory.classList.remove('open');
+		this.inventoryStore[1]({ open: false });
+		// this.inventory.classList.remove('open');
 	}
 
 	public toggleInventory(): void {
-		this.inventory.classList.toggle('open');
+		this.inventoryStore[1]({ open: !this.inventoryStore[0].open });
+		// this.inventory.classList.toggle('open');
 	}
 }

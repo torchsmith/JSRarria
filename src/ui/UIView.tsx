@@ -1,25 +1,30 @@
-import type { Accessor, Component, Signal } from 'solid-js';
-import { Inventory } from '../player';
+import type { Component } from 'solid-js';
 import { ItemTypeEnum, getItemTypeName } from '../item';
+import { SetStoreFunction } from 'solid-js/store';
+import { InventoryStore } from '../ui';
 
-const UIView: Component<{ inventory: Accessor<Inventory> }> = ({
-	inventory,
+type UIViewProps = {
+	inventory: [get: InventoryStore, set: SetStoreFunction<InventoryStore>];
+};
+
+const UIView: Component<UIViewProps> = ({
+	inventory: [{ inventory, open: inventoryOpen }],
 }) => {
-	console.log(inventory());
+	console.log({ inventory, inventoryOpen });
 	return (
 		<div>
 			<div
 				id='inventory'
-				class='open'
+				class={`${inventoryOpen ? 'open' : ''}`}
 			>
-				{Object.keys(inventory()).map((key, index, arr) => {
+				{Object.keys(inventory).map((key, index, arr) => {
 					const keyAsItemTypeEnum = Number(key) as ItemTypeEnum;
 
 					return (
 						<div>
 							<button class={`item ${index === 0 ? 'selected' : ''}`}>
 								{getItemTypeName(keyAsItemTypeEnum)}:{' '}
-								{inventory()[keyAsItemTypeEnum]}
+								{inventory[keyAsItemTypeEnum]}
 							</button>
 							{index !== arr.length - 1 && <div class='divider'></div>}
 						</div>
