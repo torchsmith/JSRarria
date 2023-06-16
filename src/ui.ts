@@ -6,6 +6,9 @@ export default class UI {
 
 	private ui = document.getElementById('ui')!;
 	private inventory = document.getElementById('inventory')!;
+	private currentItem = document.getElementById('currentItem')!;
+	private currentItemButton = this.currentItem
+		.childNodes[0] as HTMLButtonElement;
 
 	constructor() {
 		if (UI.instance) throw new Error('UI is a singleton');
@@ -79,7 +82,7 @@ export default class UI {
 	}
 
 	public selectItem(item: ItemTypeEnum | false): void {
-		const items = document.querySelectorAll('.item');
+		const items = document.querySelectorAll('#inventory .item');
 
 		items.forEach((itemElement) => {
 			itemElement.classList.remove('selected');
@@ -87,10 +90,14 @@ export default class UI {
 
 		if (!item) return;
 
-		const itemElement = document.querySelector(`.item:nth-of-type(${item})`);
+		const itemElement = document.querySelector<HTMLButtonElement>(
+			`.item:nth-of-type(${item})`
+		);
 
 		if (!itemElement) return;
 
+		this.currentItemButton.innerText = itemElement.innerText;
+		this.currentItem.classList.add('open');
 		itemElement.classList.add('selected');
 	}
 
