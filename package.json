@@ -24,7 +24,7 @@
   "devDependencies": {
     "@torchmedia/prettier-config": "^1.0.3",
     "@types/stats.js": "^0.17.0",
-    "electron": "^24.3.0",
+    "electron": "^25.2.0",
     "electron-builder": "^23.6.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.5",
