@@ -4,12 +4,20 @@ import Game from './game';
 import UI from './ui';
 import { distance, lerp } from './utils';
 
-// ADD BUT DO NOT CHANGE ORDER OR REMOVE ANYTHING FROM THIS ENUM
+// DO NOT CHANGE THESE NUMBERS
+// WHEN ADDING BE SURE NOT TO CHANGE THE ORDER
+// DO NOT INSERT ITEMS INTO MISSING SPACES (NUMBERS)
+// MISSING SPACES (NUMBERS) = DELETED ITEMS THAT SHOULD NOT BE REPLACED WITH NEW ITEMS
+
+// B = Block
+// T = Tool
+
 export const ItemType = {
 	B_Empty: 0,
 	B_Grass: 1,
 	B_Dirt: 2,
 	B_Wood: 3,
+	T_WoodenPickaxe: 4,
 } as const;
 
 type ValueOf<T> = T[keyof T];
@@ -26,6 +34,8 @@ export function getItemTypeKeyById(id: number): string | false {
 			return 'B_Dirt';
 		case ItemType.B_Wood:
 			return 'B_Wood';
+		case ItemType.T_WoodenPickaxe:
+			return 'T_WoodenPickaxe';
 		default:
 			return false;
 	}
@@ -41,6 +51,8 @@ export function getItemTypeName(itemType: ItemTypeEnum) {
 			return 'Dirt';
 		case ItemType.B_Wood:
 			return 'Wood';
+		case ItemType.T_WoodenPickaxe:
+			return 'Wooden Pickaxe';
 		default:
 			return 'Unknown';
 	}
