@@ -28,7 +28,7 @@
     "electron-builder": "^24.4.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.5",
-    "vite-plugin-electron": "^0.14.0"
+    "vite-plugin-electron": "^0.15.4"
   },
   "dependencies": {
     "sass": "^1.62.1",
