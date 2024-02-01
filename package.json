@@ -27,7 +27,7 @@
     "electron": "^26.1.0",
     "electron-builder": "^24.4.0",
     "typescript": "^5.0.4",
-    "vite": "^4.3.5",
+    "vite": "^5.0.12",
     "vite-plugin-electron": "^0.14.0"
   },
   "dependencies": {
